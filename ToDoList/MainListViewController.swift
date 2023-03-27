@@ -45,7 +45,6 @@ extension MainListViewController: UITableViewDelegate {
     
     // row tap 시 동작
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("\(indexPath.row) tapped")
         // Segueway를 작동하여 화면 호출
         performSegue(withIdentifier: "showTheList", sender: nil)
     }
