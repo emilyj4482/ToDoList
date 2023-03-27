@@ -12,4 +12,9 @@ class ToDoListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
+    
+    @IBAction func btnBackTapped(_ sender: UIButton) {
+        dismiss(animated: false)
+    }
+    
 }

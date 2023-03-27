@@ -23,7 +23,7 @@ class AddNewListViewController: UIViewController {
     }
 
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        dismiss(animated: true)
+        dismiss(animated: false)
     }
     
 }
