@@ -11,6 +11,5 @@ class MainListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // test comment
     }
 }
