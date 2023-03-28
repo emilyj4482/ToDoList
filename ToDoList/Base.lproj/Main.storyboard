@@ -26,7 +26,7 @@
                                     <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
-                                    <segue destination="tHH-Q7-rFc" kind="presentation" animates="NO" modalPresentationStyle="fullScreen" id="oFO-Qj-Xd9"/>
+                                    <segue destination="tHH-Q7-rFc" kind="presentation" modalPresentationStyle="fullScreen" id="oFO-Qj-Xd9"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ToDoList" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MBL-wq-COR">
@@ -274,7 +274,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iJa-9D-yLe">
-                                <rect key="frame" x="308" y="67" width="37" height="30"/>
+                                <rect key="frame" x="308" y="52" width="37" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="pbW-IH-p92"/>
+                                </constraints>
                                 <color key="tintColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Done">
@@ -285,19 +288,34 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Untitled list" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="55P-xD-Inn">
-                                <rect key="frame" x="35" y="77" width="243" height="37.666666666666657"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
+                                <rect key="frame" x="30" y="82" width="175.33333333333334" height="37.666666666666657"/>
+                                <fontDescription key="fontDescription" type="system" weight="black" pointSize="30"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                             </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TP2-Oc-EsU">
+                                <rect key="frame" x="30" y="52" width="48" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="egP-Nf-4eQ"/>
+                                </constraints>
+                                <color key="tintColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Cancel">
+                                    <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                </state>
+                                <connections>
+                                    <action selector="btnCancelTapped:" destination="tHH-Q7-rFc" eventType="touchUpInside" id="S3n-Ns-pnh"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="zCX-Oz-iGy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="55P-xD-Inn" firstAttribute="top" secondItem="zCX-Oz-iGy" secondAttribute="top" constant="30" id="0Fh-T1-AOV"/>
-                            <constraint firstItem="iJa-9D-yLe" firstAttribute="leading" secondItem="55P-xD-Inn" secondAttribute="trailing" constant="30" id="0XA-Pa-ANM"/>
-                            <constraint firstItem="55P-xD-Inn" firstAttribute="leading" secondItem="zCX-Oz-iGy" secondAttribute="leading" constant="35" id="4cC-Aw-QmC"/>
+                            <constraint firstItem="55P-xD-Inn" firstAttribute="leading" secondItem="zCX-Oz-iGy" secondAttribute="leading" constant="30" id="4cC-Aw-QmC"/>
+                            <constraint firstItem="TP2-Oc-EsU" firstAttribute="centerY" secondItem="iJa-9D-yLe" secondAttribute="centerY" id="AD2-VK-uzn"/>
+                            <constraint firstItem="TP2-Oc-EsU" firstAttribute="leading" secondItem="zCX-Oz-iGy" secondAttribute="leading" constant="30" id="GL8-Jc-Cra"/>
                             <constraint firstItem="zCX-Oz-iGy" firstAttribute="trailing" secondItem="iJa-9D-yLe" secondAttribute="trailing" constant="30" id="WKd-Kl-Tbf"/>
-                            <constraint firstItem="zCX-Oz-iGy" firstAttribute="top" secondItem="iJa-9D-yLe" secondAttribute="top" constant="-20" id="vBr-xA-YbQ"/>
+                            <constraint firstItem="55P-xD-Inn" firstAttribute="top" secondItem="TP2-Oc-EsU" secondAttribute="bottom" constant="10" id="deI-10-L6B"/>
+                            <constraint firstItem="iJa-9D-yLe" firstAttribute="top" secondItem="zCX-Oz-iGy" secondAttribute="top" constant="5" id="vBr-xA-YbQ"/>
                         </constraints>
                     </view>
                     <connections>
