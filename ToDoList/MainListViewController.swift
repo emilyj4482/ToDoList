@@ -16,6 +16,22 @@ class MainListViewController: UIViewController {
         self.tableView.dataSource = self
         self.tableView.delegate = self
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.isHidden = true
+    }
+    
+    
+    
+    @IBAction func btnNewListTapped(_ sender: UIButton) {
+        guard let viewController = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
+        viewController.modalTransitionStyle = .coverVertical
+        self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    
 }
 
 // Table View Data Source
@@ -45,7 +61,7 @@ extension MainListViewController: UITableViewDelegate {
     
     // row tap 시 동작
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Segueway를 작동하여 화면 호출
-        performSegue(withIdentifier: "showTheList", sender: nil)
+        guard let viewController = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
+        self.navigationController?.pushViewController(viewController, animated: true)
     }
 }

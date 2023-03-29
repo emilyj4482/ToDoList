@@ -18,10 +18,14 @@ class AddNewListViewController: UIViewController {
     }
 
     @IBAction func btnCancelTapped(_ sender: UIButton) {
-        dismiss(animated: true)
+        self.navigationController?.popViewController(animated: true)
     }
+    
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        dismiss(animated: false)
+        
+
     }
     
 }
+
+

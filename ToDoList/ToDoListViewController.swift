@@ -26,8 +26,8 @@ class ToDoListViewController: UIViewController {
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
     }
     
-    @IBAction func btnBackTapped(_ sender: UIButton) {
-        dismiss(animated: false)
+    @IBAction func btnListsTapped(_ sender: UIButton) {
+        self.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
