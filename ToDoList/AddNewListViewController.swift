@@ -21,11 +21,9 @@ class AddNewListViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    // Done button 기능 : 1) 새로운 list를 생성하고 2) 생성된 list의 todo 목록으로 넘어간다.
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        
-
+        guard let viewController = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
+        self.navigationController?.pushViewController(viewController, animated: false)
     }
-    
 }
-
-

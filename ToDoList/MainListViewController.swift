@@ -19,19 +19,14 @@ class MainListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        // Navigation Bar 숨김
         navigationController?.navigationBar.isHidden = true
     }
     
-    
-    
     @IBAction func btnNewListTapped(_ sender: UIButton) {
         guard let viewController = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
-        viewController.modalTransitionStyle = .coverVertical
         self.navigationController?.pushViewController(viewController, animated: true)
     }
-    
-    
 }
 
 // Table View Data Source
@@ -48,8 +43,6 @@ extension MainListViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         return cell
     }
-    
-    
 }
 
 // Table View Delegate

@@ -26,6 +26,22 @@ class ToDoListViewController: UIViewController {
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // AddNewViewController를 Navigation Stack에서 제외한다. >> popViewController를 했을 때 이전 Stack이 MainListViewController가 되게 하기 위함
+        guard let navigationController = self.navigationController else { return }
+        // stack의 모든 View Controller를 Array로 가져온다.
+        var navigationArray = navigationController.viewControllers
+        // MainListViewController에서 cell을 탭하여 이동했을 경우, 조치 X
+        // AddNewListViewController에서 넘어왔을 경우, Stack에서 삭제한다.
+        if navigationArray.count > 2 {
+            navigationArray.remove(at: 1)
+            print("AddNewListViewController deleted : \(navigationArray)")
+            self.navigationController?.viewControllers = navigationArray
+        }
+    }
+    
     @IBAction func btnListsTapped(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
