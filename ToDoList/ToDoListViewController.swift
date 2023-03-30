@@ -13,8 +13,10 @@ class ToDoListViewController: UIViewController {
     @IBOutlet weak var tfView: UIView!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var btnDone: UIButton!
-    
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
+    @IBOutlet weak var lblListName: UILabel!
+    
+    let taskViewModel = TaskViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +42,9 @@ class ToDoListViewController: UIViewController {
             print("AddNewListViewController deleted : \(navigationArray)")
             self.navigationController?.viewControllers = navigationArray
         }
+        
+        guard let listName = lblListName.text else { return }
+        taskViewModel.lists[listName] = []
     }
     
     @IBAction func btnListsTapped(_ sender: UIButton) {
@@ -47,6 +52,10 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
+        guard let title = textField.text else { return }
+        guard let listName = lblListName.text else { return }
+        taskViewModel.createTask(listName: listName, title: title)
+        
         hideKeyBoard()
     }
     
@@ -109,6 +118,7 @@ extension ToDoListViewController {
     
     // keyboard 숨기기 + textfield와 done 버튼 함께 숨김
     @objc private func hideKeyBoard() {
+        textField.text = ""
         textField.resignFirstResponder()
         tfView.isHidden = true
         btnDone.isHidden = true

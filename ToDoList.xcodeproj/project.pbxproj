@@ -15,6 +15,8 @@
 		A18CAC6629D186D9008001EA /* MainListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18CAC6529D186D9008001EA /* MainListViewController.swift */; };
 		A18CAC6A29D1872F008001EA /* ToDoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18CAC6929D1872F008001EA /* ToDoListViewController.swift */; };
 		A18CAC6C29D18780008001EA /* AddNewListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18CAC6B29D18780008001EA /* AddNewListViewController.swift */; };
+		A1E80AB529D579BE00CBE357 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E80AB429D579BE00CBE357 /* Task.swift */; };
+		A1E80AB729D5B74300CBE357 /* TaskViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E80AB629D5B74300CBE357 /* TaskViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		A18CAC6529D186D9008001EA /* MainListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainListViewController.swift; sourceTree = "<group>"; };
 		A18CAC6929D1872F008001EA /* ToDoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListViewController.swift; sourceTree = "<group>"; };
 		A18CAC6B29D18780008001EA /* AddNewListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewListViewController.swift; sourceTree = "<group>"; };
+		A1E80AB429D579BE00CBE357 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		A1E80AB629D5B74300CBE357 /* TaskViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +66,8 @@
 			children = (
 				A18CAC5129D13F46008001EA /* AppDelegate.swift */,
 				A18CAC5329D13F46008001EA /* SceneDelegate.swift */,
+				A1E80AB429D579BE00CBE357 /* Task.swift */,
+				A1E80AB629D5B74300CBE357 /* TaskViewModel.swift */,
 				A18CAC5729D13F46008001EA /* Main.storyboard */,
 				A18CAC6529D186D9008001EA /* MainListViewController.swift */,
 				A18CAC6B29D18780008001EA /* AddNewListViewController.swift */,
@@ -145,9 +151,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				A18CAC6629D186D9008001EA /* MainListViewController.swift in Sources */,
+				A1E80AB729D5B74300CBE357 /* TaskViewModel.swift in Sources */,
 				A18CAC6C29D18780008001EA /* AddNewListViewController.swift in Sources */,
 				A18CAC5229D13F46008001EA /* AppDelegate.swift in Sources */,
 				A18CAC6A29D1872F008001EA /* ToDoListViewController.swift in Sources */,
+				A1E80AB529D579BE00CBE357 /* Task.swift in Sources */,
 				A18CAC5429D13F46008001EA /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
