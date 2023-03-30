@@ -11,10 +11,14 @@ class MainListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     
+    let taskViewModel = TaskViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -57,4 +61,16 @@ extension MainListViewController: UITableViewDelegate {
         guard let viewController = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
         self.navigationController?.pushViewController(viewController, animated: true)
     }
+}
+
+
+
+
+class ListNameCell: UITableViewCell {
+    
+    @IBOutlet weak var listIcon: UIImageView!
+    @IBOutlet weak var lblListName: UILabel!
+    @IBOutlet weak var lblTaskCount: UILabel!
+    
+    
 }

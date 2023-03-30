@@ -9,23 +9,30 @@ import Foundation
 
 /* ViewModel : Model의 정보를 View에서 사용할 수 있도록 구성한다. */
 class TaskViewModel {
-    var lastId: Int = 0
-    var lists: [String: [Task]] = [:]
     
-    func createList(listName: String) -> Void {
-        lists[listName] = []
-        print(lists)
+    var lastId: Int = 0
+
+    // Important 리스트는 고정값
+    var lists: [List] = [List(name: "Important", tasks: [])]
+    
+    func createList(_ listName: String) -> List {
+        return List(name: listName, tasks: [])
     }
     
-    func createTask(listName: String, title: String) -> Void {
+    func addList(_ list: List) {
+        lists.append(list)
+    }
+    
+    func createTask(_ title: String) -> Task {
         let nextId = lastId + 1
         lastId = nextId
-        lists[listName]?.append(Task(id: nextId, title: title, isDone: false, isImportant: false))
-        print(lists)
+        return Task(id: nextId, title: title, isDone: false, isImportant: false)
     }
     
-    func addTask() {
-        
+    func addTask(listName: String, task: Task) {
+        if let index = lists.firstIndex(where: { $0.name == listName }) {
+            lists[index].tasks.append(task)
+        }
     }
     
     func deleteTask() {
@@ -36,7 +43,7 @@ class TaskViewModel {
         
     }
     
-    func deleteList() {
+    func deleteList(_ list: List) {
         
     }
     

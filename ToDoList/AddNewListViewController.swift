@@ -18,6 +18,8 @@ class AddNewListViewController: UIViewController {
         // 화면 뜨자마자 텍스트필드 입력 모드(키보드 호출)
         textField.becomeFirstResponder()
     }
+    
+    
 
     @IBAction func btnCancelTapped(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
@@ -26,10 +28,13 @@ class AddNewListViewController: UIViewController {
     // Done button 기능 : 1) 새로운 list를 생성하고 2) 생성된 list의 todo 목록으로 넘어간다.
     @IBAction func btnDoneTapped(_ sender: UIButton) {
         // 1) 새로운 list 생성
-        guard let listName = textField.text else { return }
-        taskViewModel.createList(listName: listName)
+        guard let newListName = textField.text else { return }
+        taskViewModel.addList(taskViewModel.createList(newListName))
+        print(taskViewModel.lists)
         
-        guard let viewController = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
-        self.navigationController?.pushViewController(viewController, animated: false)
+        // 2) 생성된 list 정보를 ToDoListViewController로 넘기면서 이동
+        guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
+        toDoListVC.listName = newListName
+        self.navigationController?.pushViewController(toDoListVC, animated: false)
     }
 }

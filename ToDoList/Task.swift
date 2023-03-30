@@ -20,4 +20,5 @@ struct Task {
 // 리스트 Object
 struct List {
     var name: String
+    var tasks: [Task]
 }

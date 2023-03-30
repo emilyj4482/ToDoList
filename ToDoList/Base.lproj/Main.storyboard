@@ -39,7 +39,7 @@
                                 <rect key="frame" x="20" y="128" width="335" height="599"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ListNameCell" id="SOE-ws-D2C">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ListNameCell" id="SOE-ws-D2C" customClass="ListNameCell" customModule="ToDoList" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="50" width="335" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SOE-ws-D2C" id="97b-Qu-8fQ">
@@ -76,6 +76,11 @@
                                                 <constraint firstItem="far-LB-Adg" firstAttribute="centerY" secondItem="97b-Qu-8fQ" secondAttribute="centerY" id="wWV-5c-OHx"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="lblListName" destination="Qls-bV-u9e" id="KG2-b1-dNU"/>
+                                            <outlet property="lblTaskCount" destination="0TF-xG-LV7" id="rZD-Po-gea"/>
+                                            <outlet property="listIcon" destination="far-LB-Adg" id="XpV-OA-i6w"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
