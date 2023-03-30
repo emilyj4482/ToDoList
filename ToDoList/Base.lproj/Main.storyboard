@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="t9F-hU-FOb">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Gq7-Z0-cNV">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -12,7 +12,7 @@
         <!--Main List View Controller-->
         <scene sceneID="ck7-Ay-0Bh">
             <objects>
-                <viewController modalPresentationStyle="fullScreen" id="t9F-hU-FOb" customClass="MainListViewController" customModule="ToDoList" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MainListViewController" modalPresentationStyle="fullScreen" id="t9F-hU-FOb" customClass="MainListViewController" customModule="ToDoList" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="xOL-0L-Tnj">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -26,7 +26,7 @@
                                     <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
-                                    <segue destination="tHH-Q7-rFc" kind="presentation" modalPresentationStyle="fullScreen" id="oFO-Qj-Xd9"/>
+                                    <action selector="btnNewListTapped:" destination="t9F-hU-FOb" eventType="touchUpInside" id="axB-tN-IbT"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ToDoList" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MBL-wq-COR">
@@ -94,19 +94,36 @@
                             <constraint firstItem="MBL-wq-COR" firstAttribute="leading" secondItem="cwF-Rz-LSk" secondAttribute="leading" constant="30" id="zGr-b4-Sgf"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="14h-RE-xPl"/>
+                    <nil key="simulatedTopBarMetrics"/>
                     <connections>
                         <outlet property="tableView" destination="EmU-Nv-osD" id="3yW-CK-jpG"/>
-                        <segue destination="qIg-MI-qeM" kind="presentation" identifier="showTheList" animates="NO" id="lre-hX-lVD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cEe-Vd-tKf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2073" y="-1429"/>
+            <point key="canvasLocation" x="-2383" y="-1349"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="gKG-ZE-joz">
+            <objects>
+                <navigationController id="Gq7-Z0-cNV" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="UHK-gN-QuN">
+                        <rect key="frame" x="0.0" y="47" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="t9F-hU-FOb" kind="relationship" relationship="rootViewController" id="BR1-Kf-ge7"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PHx-1H-tEC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-3137" y="-1349"/>
         </scene>
         <!--To Do List View Controller-->
         <scene sceneID="zKY-yQ-ES5">
             <objects>
-                <viewController modalPresentationStyle="fullScreen" id="qIg-MI-qeM" customClass="ToDoListViewController" customModule="ToDoList" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ToDoListViewController" modalPresentationStyle="fullScreen" id="qIg-MI-qeM" customClass="ToDoListViewController" customModule="ToDoList" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="nP6-de-cH0">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -122,7 +139,7 @@
                                     <color key="titleColor" systemColor="tintColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="btnBackTapped:" destination="qIg-MI-qeM" eventType="touchUpInside" id="8iA-qS-AdU"/>
+                                    <action selector="btnListsTapped:" destination="qIg-MI-qeM" eventType="touchUpInside" id="BPk-oq-egS"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Important" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xxp-ia-A05">
@@ -208,7 +225,7 @@
                                 <rect key="frame" x="0.0" y="728" width="375" height="50"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="gJI-Fv-Bkz">
-                                        <rect key="frame" x="30" y="15.999999999999998" width="20" height="18.666666666666664"/>
+                                        <rect key="frame" x="30" y="16" width="20" height="18.666666666666657"/>
                                         <color key="tintColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="20" id="GmF-8T-ewa"/>
@@ -253,6 +270,7 @@
                             <constraint firstItem="24a-jW-YAy" firstAttribute="centerX" secondItem="H58-WY-9E7" secondAttribute="centerX" id="sWz-Qt-oTZ"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="vj9-lq-yRF"/>
                     <connections>
                         <outlet property="btnDone" destination="cqR-jS-MOw" id="vmU-ED-9LK"/>
                         <outlet property="tableView" destination="24a-jW-YAy" id="vga-gv-ECT"/>
@@ -263,12 +281,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9hB-QA-2aF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1258.4000000000001" y="-1691.3793103448277"/>
+            <point key="canvasLocation" x="-1636" y="-1670"/>
         </scene>
         <!--Add New List View Controller-->
         <scene sceneID="do1-Eo-Jdy">
             <objects>
-                <viewController modalPresentationStyle="fullScreen" id="tHH-Q7-rFc" customClass="AddNewListViewController" customModule="ToDoList" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddNewListViewController" modalPresentationStyle="fullScreen" id="tHH-Q7-rFc" customClass="AddNewListViewController" customModule="ToDoList" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lKz-FI-NiX">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -324,7 +342,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="g2P-lJ-jbe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1258" y="-1027"/>
+            <point key="canvasLocation" x="-1636" y="-992"/>
         </scene>
     </scenes>
     <resources>
