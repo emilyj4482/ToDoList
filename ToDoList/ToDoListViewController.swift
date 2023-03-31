@@ -24,16 +24,25 @@ class ToDoListViewController: UIViewController {
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
+        // keyboard detection
+        detectKeyboard()
+        // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
+        
+        
+        
+        
+        // test code
+        taskViewModel.addList(taskViewModel.createList("to study"))
+        taskViewModel.addTask(listName: "to study", task: taskViewModel.createTask("iOS"))
+        taskViewModel.addTask(listName: "to study", task: taskViewModel.createTask("Swift"))
+
         // AddNewListViewController로부터 listName 전달 받기
         if let listName = listName {
             self.lblListName.text = listName
             taskViewModel.addList(List(name: listName, tasks: []))
         }
         
-        // keyboard detection
-        detectKeyboard()
-        // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
-        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -57,7 +66,8 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        guard let title = textField.text else { return }
+        // textfield에 입력값이 없으면 return
+        guard let title = textField.text, title.isEmpty == false else { return }
         if let listName = listName {
             taskViewModel.addTask(listName: listName, task: taskViewModel.createTask(title))
         }
@@ -75,16 +85,30 @@ class ToDoListViewController: UIViewController {
 
 // Table View Data Source
 extension ToDoListViewController: UITableViewDataSource {
-    // row 개수 = 생성한 list 개수
+    // row 개수 = 생성한 task 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        if let index = taskViewModel.lists.firstIndex(where: { $0.name == "to study" }) {
+            return taskViewModel.lists[index].tasks.count
+        } else {
+            return 0
+        }
     }
     
     // cell 지정
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
+        // cell 뷰 적용
+        // >> check
+        
+        // >> text label
+        if let index = taskViewModel.lists.firstIndex(where: { $0.name == "to study" }) {
+            cell.lblTask.text = taskViewModel.lists[index].tasks[indexPath.row].title
+        }
+
+        // >> important
+        
         return cell
     }
 }
@@ -128,5 +152,21 @@ extension ToDoListViewController {
         textField.resignFirstResponder()
         tfView.isHidden = true
         btnDone.isHidden = true
+    }
+}
+
+class ToDoCell: UITableViewCell {
+    @IBOutlet weak var btnCheck: UIButton!
+    @IBOutlet weak var lblTask: UILabel!
+    @IBOutlet weak var btnImportant: UIButton!
+    
+    @IBAction func btnCheckTapped(_ sender: UIButton) {
+        // 클릭 시 이전 상태와 반대로 상태 바꿈
+        btnCheck.isSelected = !btnCheck.isSelected
+    }
+    
+    @IBAction func btnImportantTapped(_ sender: UIButton) {
+        // 클릭 시 이전 상태와 반대로 상태 바꿈
+        btnImportant.isSelected = !btnImportant.isSelected
     }
 }

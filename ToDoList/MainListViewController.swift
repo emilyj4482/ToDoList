@@ -31,8 +31,8 @@ class MainListViewController: UIViewController {
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
-        guard let viewController = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
-        self.navigationController?.pushViewController(viewController, animated: true)
+        guard let addNewListVC = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
+        self.navigationController?.pushViewController(addNewListVC, animated: true)
     }
 }
 
@@ -84,14 +84,8 @@ extension MainListViewController: UITableViewDelegate {
     }
 }
 
-
-
-
 class ListNameCell: UITableViewCell {
-    
     @IBOutlet weak var listIcon: UIImageView!
     @IBOutlet weak var lblListName: UILabel!
     @IBOutlet weak var lblTaskCount: UILabel!
-    
-    
 }
