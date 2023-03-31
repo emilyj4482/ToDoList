@@ -27,11 +27,13 @@ class AddNewListViewController: UIViewController {
     
     // Done button 기능 : 1) 새로운 list를 생성하고 2) 생성된 list의 todo 목록으로 넘어간다.
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        // 1) 새로운 list 생성
-        guard let newListName = textField.text else { return }
+        // 1) 새로운 list 생성 (textfield 공백 시 Untitled list 전달)
+        guard var newListName = textField.text else { return }
+        if newListName.isEmpty {
+            newListName = "Untitled list"
+        }
         taskViewModel.addList(taskViewModel.createList(newListName))
         print(taskViewModel.lists)
-        
         // 2) 생성된 list 정보를 ToDoListViewController로 넘기면서 이동
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
         toDoListVC.listName = newListName
