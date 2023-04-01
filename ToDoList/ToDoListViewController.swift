@@ -32,8 +32,15 @@ class ToDoListViewController: UIViewController {
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
 
         // AddNewListViewController로부터 전달 받은 list 정보에서 name 추출하여 view에 업데이트
-        if let list = list {
+        if var list = list {
             self.lblListName.text = list.name
+            
+            
+            
+            // test code
+            list.tasks.append(Task(id: 324, title: "to study", isDone: false, isImportant: false))
+            print(list)
+            self.tableView.reloadData()
         }
     }
     
@@ -70,6 +77,8 @@ class ToDoListViewController: UIViewController {
             }
             print(taskViewModel.lists)
             hideKeyBoard()
+            // tableView reload를 통해 뷰가 업데이트 된 정보를 반영하도록 한다.
+            self.tableView.reloadData()
         }
     }
     
@@ -101,14 +110,10 @@ extension ToDoListViewController: UITableViewDataSource {
         // >> check
         
         // >> text label
-        if let listName = list?.name {
-            cell.lblTask.text = listName
+        if let taskTitle = list?.tasks[indexPath.row].title {
+            cell.lblTask.text = taskTitle
         }
         
-        /*
-        if let index = taskViewModel.lists.firstIndex(where: { $0.name == list.name }) {
-             = taskViewModel.lists[index].tasks[indexPath.row].title
-        } */
 
         // >> important
         
