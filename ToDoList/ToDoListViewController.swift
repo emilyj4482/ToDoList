@@ -66,13 +66,16 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        // textfield에 입력값이 없으면 return
-        guard let title = textField.text, title.isEmpty == false else { return }
-        if let listName = listName {
-            taskViewModel.addTask(listName: listName, task: taskViewModel.createTask(title))
+        guard let title = textField.text else { return }
+        if title.isEmpty {
+            hideKeyBoard()
+        } else {
+            if let listName = listName {
+                taskViewModel.addTask(listName: listName, task: taskViewModel.createTask(title))
+            }
+            print(taskViewModel.lists)
+            hideKeyBoard()
         }
-        print(taskViewModel.lists)
-        hideKeyBoard()
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
