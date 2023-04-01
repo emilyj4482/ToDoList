@@ -11,17 +11,15 @@ class MainListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     
-    let taskViewModel = TaskViewModel()
+    var taskViewModel = TaskViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
-        // test code
-        taskViewModel.addList(taskViewModel.createList("to study"))
-        taskViewModel.addTask(listName: "to study", task: taskViewModel.createTask("iOS"))
-        taskViewModel.addTask(listName: "to study", task: taskViewModel.createTask("Swift"))
+        // pop 이기 때문에 동작하지 않는다. 추후에 reload 필요
+        print(taskViewModel.lists)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -31,7 +29,10 @@ class MainListViewController: UIViewController {
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
+        print(taskViewModel.lists)
         guard let addNewListVC = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
+        // AddNewListViewController로 ViewModel 넘기면서 이동
+        addNewListVC.taskViewModel = self.taskViewModel
         self.navigationController?.pushViewController(addNewListVC, animated: true)
     }
 }
@@ -78,8 +79,8 @@ extension MainListViewController: UITableViewDelegate {
     // row tap 시 동작
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
-        // list name 전달
-        toDoListVC.listName = taskViewModel.lists[indexPath.row].name
+        // ToDoListViewController로 ViewModel 및 list 정보 넘기면서 이동
+        toDoListVC.list = taskViewModel.lists[indexPath.row]
         self.navigationController?.pushViewController(toDoListVC, animated: true)
     }
 }

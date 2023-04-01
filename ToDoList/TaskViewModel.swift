@@ -22,12 +22,12 @@ class TaskViewModel {
         // List 이름 중복 검사 : 입력값 앞뒤 공백 제거해준 뒤 lists Array 및 noOverlap Dictionary에서 중복 검사를 해준다. 중복 횟수에 따라 이름 뒤에 () 괄호 안 숫자를 넣어 붙여준다.
         if lists.firstIndex(where: { $0.name == listName.trim() }) != nil && noOverlap[listName] == nil {
             noOverlap[listName] = 1
-            if var count = noOverlap[listName] {
+            if let count = noOverlap[listName] {
                 return List(name: "\(listName.trim()) (\(count))", tasks: [])
             }
         } else if lists.firstIndex(where: { $0.name == listName.trim() }) != nil && noOverlap[listName] != nil {
             noOverlap[listName]! += 1
-            if var count = noOverlap[listName] {
+            if let count = noOverlap[listName] {
                 return List(name: "\(listName.trim()) (\(count))", tasks: [])
             }
         }
@@ -45,13 +45,13 @@ class TaskViewModel {
         return Task(id: nextId, title: title.trim(), isDone: false, isImportant: false)
     }
     
-    func addTask(listName: String, task: Task) {
+    func addTask(_ listName: String, _ task: Task) {
         if let index = lists.firstIndex(where: { $0.name == listName }) {
             lists[index].tasks.append(task)
         }
     }
     
-    func deleteTask() {
+    func deleteTask(_ taskId: Int) {
         
     }
     

@@ -16,33 +16,25 @@ class ToDoListViewController: UIViewController {
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
     @IBOutlet weak var lblListName: UILabel!
     
-    let taskViewModel = TaskViewModel()
-    var listName: String?
-    
+    var taskViewModel = TaskViewModel()
+    var list: List?
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
+        print(taskViewModel.lists)
+        
         // keyboard detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
-        
-        
-        
-        
-        // test code
-        taskViewModel.addList(taskViewModel.createList("to study"))
-        taskViewModel.addTask(listName: "to study", task: taskViewModel.createTask("iOS"))
-        taskViewModel.addTask(listName: "to study", task: taskViewModel.createTask("Swift"))
 
-        // AddNewListViewController로부터 listName 전달 받기
-        if let listName = listName {
-            self.lblListName.text = listName
-            taskViewModel.addList(List(name: listName, tasks: []))
+        // AddNewListViewController로부터 전달 받은 list 정보에서 name 추출하여 view에 업데이트
+        if let list = list {
+            self.lblListName.text = list.name
         }
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -62,6 +54,9 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnListsTapped(_ sender: UIButton) {
+        // ViewModel 넘기면서 이동
+        guard let mainListVC = self.storyboard?.instantiateViewController(identifier: "MainListViewController") as? MainListViewController else { return }
+        mainListVC.taskViewModel = self.taskViewModel
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -70,8 +65,8 @@ class ToDoListViewController: UIViewController {
         if title.isEmpty {
             hideKeyBoard()
         } else {
-            if let listName = listName {
-                taskViewModel.addTask(listName: listName, task: taskViewModel.createTask(title))
+            if let listName = list?.name {
+                taskViewModel.addTask(listName, taskViewModel.createTask(title))
             }
             print(taskViewModel.lists)
             hideKeyBoard()
@@ -106,9 +101,14 @@ extension ToDoListViewController: UITableViewDataSource {
         // >> check
         
         // >> text label
-        if let index = taskViewModel.lists.firstIndex(where: { $0.name == "to study" }) {
-            cell.lblTask.text = taskViewModel.lists[index].tasks[indexPath.row].title
+        if let listName = list?.name {
+            cell.lblTask.text = listName
         }
+        
+        /*
+        if let index = taskViewModel.lists.firstIndex(where: { $0.name == list.name }) {
+             = taskViewModel.lists[index].tasks[indexPath.row].title
+        } */
 
         // >> important
         
