@@ -11,7 +11,7 @@ class AddNewListViewController: UIViewController {
 
     @IBOutlet weak var textField: UITextField!
     
-    var taskViewModel = TaskViewModel()
+    var taskViewModel = TaskViewModel.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,10 +34,10 @@ class AddNewListViewController: UIViewController {
         }
         taskViewModel.addList(taskViewModel.createList(newListName))
         print(taskViewModel.lists)
-        // 2) ViewModel 및 생성된 list 정보를 ToDoListViewController로 넘기면서 이동
+        // 2) ViewModel 및 생성된 list의 index를 ToDoListViewController로 넘기면서 이동
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
         toDoListVC.taskViewModel = self.taskViewModel
-        toDoListVC.list = taskViewModel.lists[taskViewModel.lists.count-1]
+        toDoListVC.index = taskViewModel.lists.count - 1
         self.navigationController?.pushViewController(toDoListVC, animated: false)
     }
 }

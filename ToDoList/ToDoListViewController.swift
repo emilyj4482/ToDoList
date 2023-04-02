@@ -16,32 +16,24 @@ class ToDoListViewController: UIViewController {
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
     @IBOutlet weak var lblListName: UILabel!
     
-    var taskViewModel = TaskViewModel()
-    var list: List?
-        
+    var taskViewModel = TaskViewModel.shared
+    var index: Int?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
-        
-        print(taskViewModel.lists)
         
         // keyboard detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
 
-        // AddNewListViewController로부터 전달 받은 list 정보에서 name 추출하여 view에 업데이트
-        if var list = list {
-            self.lblListName.text = list.name
-            
-            
-            
-            // test code
-            list.tasks.append(Task(id: 324, title: "to study", isDone: false, isImportant: false))
-            print(list)
-            self.tableView.reloadData()
-        }
+        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 list name 추출하여 view에 업데이트
+        guard let index = index else { return }
+        self.lblListName.text = taskViewModel.lists[index].name
+        
+        self.tableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -61,25 +53,21 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnListsTapped(_ sender: UIButton) {
-        // ViewModel 넘기면서 이동
+        // ViewModel 넘기면서 Main으로 이동
         guard let mainListVC = self.storyboard?.instantiateViewController(identifier: "MainListViewController") as? MainListViewController else { return }
         mainListVC.taskViewModel = self.taskViewModel
         self.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        guard let title = textField.text else { return }
+        guard let title = textField.text, let index = index else { return }
         if title.isEmpty {
             hideKeyBoard()
         } else {
-            if let listName = list?.name {
-                taskViewModel.addTask(listName, taskViewModel.createTask(title))
-            }
-            print(taskViewModel.lists)
-            hideKeyBoard()
-            // tableView reload를 통해 뷰가 업데이트 된 정보를 반영하도록 한다.
-            self.tableView.reloadData()
+            taskViewModel.addTask(taskViewModel.lists[index].name, taskViewModel.createTask(title))
         }
+        print(taskViewModel.lists)
+        hideKeyBoard()
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
@@ -110,11 +98,10 @@ extension ToDoListViewController: UITableViewDataSource {
         // >> check
         
         // >> text label
-        if let taskTitle = list?.tasks[indexPath.row].title {
-            cell.lblTask.text = taskTitle
+        if let index = index {
+            cell.lblTask.text = taskViewModel.lists[index].tasks[indexPath.row].title
         }
         
-
         // >> important
         
         return cell

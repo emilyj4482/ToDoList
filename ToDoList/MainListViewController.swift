@@ -11,7 +11,7 @@ class MainListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     
-    var taskViewModel = TaskViewModel()
+    var taskViewModel = TaskViewModel.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +50,7 @@ extension MainListViewController: UITableViewDataSource {
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
         // cell 뷰 적용
-        // >> icon
+        // >> icon : Important만 star image, 나머지 list는 checklist image
         if indexPath.row > 0 {
             cell.listIcon.image = UIImage(systemName: "checklist.checked")
         }
@@ -59,7 +59,7 @@ extension MainListViewController: UITableViewDataSource {
         let list = taskViewModel.lists[indexPath.row]
         cell.lblListName?.text = list.name
         
-        // >> count label
+        // >> count label : list 당 task 개수 표시. 0개일 때는 표시 X
         if list.tasks.count == 0 {
             cell.lblTaskCount.text = ""
         } else {
@@ -80,7 +80,8 @@ extension MainListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
         // ToDoListViewController로 ViewModel 및 list 정보 넘기면서 이동
-        toDoListVC.list = taskViewModel.lists[indexPath.row]
+        toDoListVC.taskViewModel = self.taskViewModel
+        toDoListVC.index = indexPath.row
         self.navigationController?.pushViewController(toDoListVC, animated: true)
     }
 }
