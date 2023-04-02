@@ -11,7 +11,7 @@ import Foundation
 class TaskViewModel {
     
     // 싱글톤 객체로 선언 : 앱 전반에서 앱 관리를 이 객체 혼자서 하기 때문에 싱글톤으로 선언한다.
-      static let shared = TaskViewModel()
+    static let shared = TaskViewModel()
     
     // Task.id 저장용 프로퍼티
     var lastId: Int = 0

@@ -11,6 +11,7 @@ class ToDoListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var tfView: UIView!
+    @IBOutlet weak var btnAddTask: UIButton!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var btnDone: UIButton!
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
@@ -18,7 +19,7 @@ class ToDoListViewController: UIViewController {
     
     var taskViewModel = TaskViewModel.shared
     var index: Int?
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
@@ -33,7 +34,10 @@ class ToDoListViewController: UIViewController {
         guard let index = index else { return }
         self.lblListName.text = taskViewModel.lists[index].name
         
-        self.tableView.reloadData()
+        // Important list의 경우 star icon을 통해서만 task를 추가할 수 있도록 구현 >> Add a Task 기능 비활성화
+        if index == 0 {
+            btnAddTask.isHidden = true
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -60,7 +64,7 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        guard let title = textField.text, let index = index else { return }
+        guard let title = textField.text?.trim(), let index = index else { return }
         if title.isEmpty {
             hideKeyBoard()
         } else {
@@ -68,6 +72,7 @@ class ToDoListViewController: UIViewController {
         }
         print(taskViewModel.lists)
         hideKeyBoard()
+        self.tableView.reloadData()
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
@@ -82,11 +87,8 @@ class ToDoListViewController: UIViewController {
 extension ToDoListViewController: UITableViewDataSource {
     // row 개수 = 생성한 task 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let index = taskViewModel.lists.firstIndex(where: { $0.name == "to study" }) {
-            return taskViewModel.lists[index].tasks.count
-        } else {
-            return 0
-        }
+        guard let index = index else { return 0 }
+        return taskViewModel.lists[index].tasks.count
     }
     
     // cell 지정
@@ -158,6 +160,7 @@ class ToDoCell: UITableViewCell {
     @IBAction func btnCheckTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
         btnCheck.isSelected = !btnCheck.isSelected
+        
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {

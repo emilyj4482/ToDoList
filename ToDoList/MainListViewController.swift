@@ -17,15 +17,14 @@ class MainListViewController: UIViewController {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
-        
-        // pop 이기 때문에 동작하지 않는다. 추후에 reload 필요
-        print(taskViewModel.lists)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Navigation Bar 숨김
         navigationController?.navigationBar.isHidden = true
+        
+        self.tableView.reloadData()
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
@@ -51,7 +50,9 @@ extension MainListViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         // cell 뷰 적용
         // >> icon : Important만 star image, 나머지 list는 checklist image
-        if indexPath.row > 0 {
+        if indexPath.row == 0 {
+            cell.listIcon.image = UIImage(systemName: "star.fill")
+        } else {
             cell.listIcon.image = UIImage(systemName: "checklist.checked")
         }
         
