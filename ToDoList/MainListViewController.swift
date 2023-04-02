@@ -11,6 +11,8 @@ class MainListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     
+    var taskViewModel = TaskViewModel.shared
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
@@ -21,11 +23,16 @@ class MainListViewController: UIViewController {
         super.viewWillAppear(animated)
         // Navigation Bar 숨김
         navigationController?.navigationBar.isHidden = true
+        
+        self.tableView.reloadData()
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
-        guard let viewController = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
-        self.navigationController?.pushViewController(viewController, animated: true)
+        print(taskViewModel.lists)
+        guard let addNewListVC = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
+        // AddNewListViewController로 ViewModel 넘기면서 이동
+        addNewListVC.taskViewModel = self.taskViewModel
+        self.navigationController?.pushViewController(addNewListVC, animated: true)
     }
 }
 
@@ -33,14 +40,32 @@ class MainListViewController: UIViewController {
 extension MainListViewController: UITableViewDataSource {
     // row 개수 = 생성한 list 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return taskViewModel.lists.count
     }
     
     // cell 지정
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ListNameCell", for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ListNameCell", for: indexPath) as? ListNameCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
+        // cell 뷰 적용
+        // >> icon : Important만 star image, 나머지 list는 checklist image
+        if indexPath.row == 0 {
+            cell.listIcon.image = UIImage(systemName: "star.fill")
+        } else {
+            cell.listIcon.image = UIImage(systemName: "checklist.checked")
+        }
+        
+        // >> text label
+        let list = taskViewModel.lists[indexPath.row]
+        cell.lblListName?.text = list.name
+        
+        // >> count label : list 당 task 개수 표시. 0개일 때는 표시 X
+        if list.tasks.count == 0 {
+            cell.lblTaskCount.text = ""
+        } else {
+            cell.lblTaskCount.text = String(list.tasks.count)
+        }
         return cell
     }
 }
@@ -54,7 +79,16 @@ extension MainListViewController: UITableViewDelegate {
     
     // row tap 시 동작
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let viewController = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
-        self.navigationController?.pushViewController(viewController, animated: true)
+        guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
+        // ToDoListViewController로 ViewModel 및 list 정보 넘기면서 이동
+        toDoListVC.taskViewModel = self.taskViewModel
+        toDoListVC.index = indexPath.row
+        self.navigationController?.pushViewController(toDoListVC, animated: true)
     }
+}
+
+class ListNameCell: UITableViewCell {
+    @IBOutlet weak var listIcon: UIImageView!
+    @IBOutlet weak var lblListName: UILabel!
+    @IBOutlet weak var lblTaskCount: UILabel!
 }

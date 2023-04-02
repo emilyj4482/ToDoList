@@ -11,19 +11,33 @@ class ToDoListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var tfView: UIView!
+    @IBOutlet weak var btnAddTask: UIButton!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var btnDone: UIButton!
-    
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
+    @IBOutlet weak var lblListName: UILabel!
     
+    var taskViewModel = TaskViewModel.shared
+    var index: Int?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
+        
         // keyboard detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
+
+        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 list name 추출하여 view에 업데이트
+        guard let index = index else { return }
+        self.lblListName.text = taskViewModel.lists[index].name
+        
+        // Important list의 경우 star icon을 통해서만 task를 추가할 수 있도록 구현 >> Add a Task 기능 비활성화
+        if index == 0 {
+            btnAddTask.isHidden = true
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -43,11 +57,22 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnListsTapped(_ sender: UIButton) {
+        // ViewModel 넘기면서 Main으로 이동
+        guard let mainListVC = self.storyboard?.instantiateViewController(identifier: "MainListViewController") as? MainListViewController else { return }
+        mainListVC.taskViewModel = self.taskViewModel
         self.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
+        guard let title = textField.text?.trim(), let index = index else { return }
+        if title.isEmpty {
+            hideKeyBoard()
+        } else {
+            taskViewModel.addTask(taskViewModel.lists[index].name, taskViewModel.createTask(title))
+        }
+        print(taskViewModel.lists)
         hideKeyBoard()
+        self.tableView.reloadData()
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
@@ -60,16 +85,27 @@ class ToDoListViewController: UIViewController {
 
 // Table View Data Source
 extension ToDoListViewController: UITableViewDataSource {
-    // row 개수 = 생성한 list 개수
+    // row 개수 = 생성한 task 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        guard let index = index else { return 0 }
+        return taskViewModel.lists[index].tasks.count
     }
     
     // cell 지정
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
+        // cell 뷰 적용
+        // >> check
+        
+        // >> text label
+        if let index = index {
+            cell.lblTask.text = taskViewModel.lists[index].tasks[indexPath.row].title
+        }
+        
+        // >> important
+        
         return cell
     }
 }
@@ -107,10 +143,28 @@ extension ToDoListViewController {
         tfViewBottom.constant = 0
     }
     
-    // keyboard 숨기기 + textfield와 done 버튼 함께 숨김
+    // keyboard 숨기기 + textfield를 비운 뒤 done 버튼과 함께 숨김
     @objc private func hideKeyBoard() {
+        textField.text = ""
         textField.resignFirstResponder()
         tfView.isHidden = true
         btnDone.isHidden = true
+    }
+}
+
+class ToDoCell: UITableViewCell {
+    @IBOutlet weak var btnCheck: UIButton!
+    @IBOutlet weak var lblTask: UILabel!
+    @IBOutlet weak var btnImportant: UIButton!
+    
+    @IBAction func btnCheckTapped(_ sender: UIButton) {
+        // 클릭 시 이전 상태와 반대로 상태 바꿈
+        btnCheck.isSelected = !btnCheck.isSelected
+        
+    }
+    
+    @IBAction func btnImportantTapped(_ sender: UIButton) {
+        // 클릭 시 이전 상태와 반대로 상태 바꿈
+        btnImportant.isSelected = !btnImportant.isSelected
     }
 }
