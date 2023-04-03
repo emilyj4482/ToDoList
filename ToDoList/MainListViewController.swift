@@ -26,7 +26,13 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         
         self.tableView.reloadData()
-        lblCount.text = "You have \(taskViewModel.lists.count - 1) custom lists."
+        
+        let count = taskViewModel.lists.count - 1
+        if count <= 1 {
+            lblCount.text = "You have \(count) custom list."
+        } else {
+            lblCount.text = "You have \(count) custom lists."
+        }
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
