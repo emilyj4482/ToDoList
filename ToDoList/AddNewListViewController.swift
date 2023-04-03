@@ -31,7 +31,6 @@ class AddNewListViewController: UIViewController {
             newListName = "Untitled list"
         }
         taskViewModel.addList(taskViewModel.createList(newListName))
-        print(taskViewModel.lists)
         // 2) ViewModel 및 생성된 list의 index를 ToDoListViewController로 넘기면서 이동
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
         toDoListVC.taskViewModel = self.taskViewModel

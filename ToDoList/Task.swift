@@ -15,6 +15,12 @@ struct Task {
     var title: String
     var isDone: Bool
     var isImportant: Bool
+    
+    mutating func update(title: String, isDone: Bool, isImportant: Bool) {
+        self.title = title
+        self.isDone = isDone
+        self.isImportant = isImportant
+    }
 }
 
 // 리스트 Object

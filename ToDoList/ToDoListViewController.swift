@@ -30,14 +30,22 @@ class ToDoListViewController: UIViewController {
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
 
-        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 list name 추출하여 view에 업데이트
+        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
         guard let index = index else { return }
+        // list 이름 라벨에 적용
         self.lblListName.text = taskViewModel.lists[index].name
         
         // Important list의 경우 star icon을 통해서만 task를 추가할 수 있도록 구현 >> Add a Task 기능 비활성화
         if index == 0 {
             btnAddTask.isHidden = true
         }
+        
+        print(taskViewModel.lists)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -64,11 +72,11 @@ class ToDoListViewController: UIViewController {
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        guard let title = textField.text?.trim(), let index = index else { return }
+        guard let title = textField.text?.trim() else { return }
         if title.isEmpty {
             hideKeyBoard()
         } else {
-            taskViewModel.addTask(taskViewModel.lists[index].name, taskViewModel.createTask(title))
+            taskViewModel.addTask(taskViewModel.lists[index!].name, taskViewModel.createTask(title))
         }
         print(taskViewModel.lists)
         hideKeyBoard()
@@ -87,8 +95,7 @@ class ToDoListViewController: UIViewController {
 extension ToDoListViewController: UITableViewDataSource {
     // row 개수 = 생성한 task 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let index = index else { return 0 }
-        return taskViewModel.lists[index].tasks.count
+        return taskViewModel.lists[index!].tasks.count
     }
     
     // cell 지정
@@ -96,16 +103,40 @@ extension ToDoListViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
+        let list: List = taskViewModel.lists[index!]
+        var task: Task = list.tasks[indexPath.row]
         // cell 뷰 적용
         // >> check
-        
+        cell.checkbutton(isDone: task.isDone)
         // >> text label
-        if let index = index {
-            cell.lblTask.text = taskViewModel.lists[index].tasks[indexPath.row].title
+        cell.lblTask.text = task.title
+        // >> important
+        cell.btnImportant.isSelected = task.isImportant
+        
+        // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
+        
+        cell.checkButtonTapHandler = { isDone in
+            task.isDone = isDone
+            self.taskViewModel.updateTask(list.name, taskId: task.id, task: task)
+            self.tableView.reloadData()
+            print(task)
         }
         
-        // >> important
-        
+        cell.importantButtonTapHandler = { isImportant in
+            task.isImportant = isImportant
+            self.taskViewModel.updateTask(list.name, taskId: task.id, task: task)
+            
+            // Important list에 대한 추가/삭제 적용
+            if isImportant {
+                self.taskViewModel.addImportant(task)
+            } else {
+                self.taskViewModel.unImportant(task.id)
+            }
+            
+            self.tableView.reloadData()
+            print(task)
+        }
+
         return cell
     }
 }
@@ -157,14 +188,36 @@ class ToDoCell: UITableViewCell {
     @IBOutlet weak var lblTask: UILabel!
     @IBOutlet weak var btnImportant: UIButton!
     
+    var checkButtonTapHandler: ((Bool) -> Void)?
+    var importantButtonTapHandler: ((Bool) -> Void)?
+    
     @IBAction func btnCheckTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
         btnCheck.isSelected = !btnCheck.isSelected
         
+        // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
+        checkbutton(isDone: btnCheck.isSelected)
+        
+        // 데이터 변동 : checkButtonTapHandler에 isDone 여부 전송
+        checkButtonTapHandler?(btnCheck.isSelected)
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
         btnImportant.isSelected = !btnImportant.isSelected
+        
+        // 데이터 변동 : importantButtonTapHandler에 isImportant 여부 전송
+        importantButtonTapHandler?(btnImportant.isSelected)
+    }
+    
+    // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
+    func checkbutton(isDone: Bool) {
+        if isDone {
+            lblTask.attributedText = NSAttributedString(string: lblTask.text!, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            lblTask.alpha = 0.5
+        } else {
+            lblTask.attributedText = NSAttributedString(string: lblTask.text!, attributes: [.strikethroughStyle: NSUnderlineStyle()])
+            lblTask.alpha = 1
+        }
     }
 }
