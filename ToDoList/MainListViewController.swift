@@ -25,10 +25,11 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         
         self.tableView.reloadData()
+        
+        print(taskViewModel.lists)
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
-        print(taskViewModel.lists)
         guard let addNewListVC = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
         // AddNewListViewController로 ViewModel 넘기면서 이동
         addNewListVC.taskViewModel = self.taskViewModel
