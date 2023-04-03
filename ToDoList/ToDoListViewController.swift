@@ -19,6 +19,7 @@ class ToDoListViewController: UIViewController {
     
     var taskViewModel = TaskViewModel.shared
     var index: Int?
+    var listId: Int?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +33,8 @@ class ToDoListViewController: UIViewController {
 
         // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
         guard let index = index else { return }
+        listId = taskViewModel.lists[index].id
+        
         // list 이름 라벨에 적용
         self.lblListName.text = taskViewModel.lists[index].name
         
@@ -39,8 +42,6 @@ class ToDoListViewController: UIViewController {
         if index == 0 {
             btnAddTask.isHidden = true
         }
-        
-        print(taskViewModel.lists)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -59,7 +60,6 @@ class ToDoListViewController: UIViewController {
         // AddNewListViewController에서 넘어왔을 경우, Stack에서 삭제한다.
         if navigationArray.count > 2 {
             navigationArray.remove(at: 1)
-            print("AddNewListViewController deleted : \(navigationArray)")
             self.navigationController?.viewControllers = navigationArray
         }
     }
@@ -76,9 +76,8 @@ class ToDoListViewController: UIViewController {
         if title.isEmpty {
             hideKeyBoard()
         } else {
-            taskViewModel.addTask(taskViewModel.lists[index!].name, taskViewModel.createTask(title))
+            taskViewModel.addTask(listId: listId!, taskViewModel.createTask(listId: listId!, title))
         }
-        print(taskViewModel.lists)
         hideKeyBoard()
         self.tableView.reloadData()
     }
@@ -103,10 +102,12 @@ extension ToDoListViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
-        let list: List = taskViewModel.lists[index!]
-        var task: Task = list.tasks[indexPath.row]
+        
+        var task: Task = taskViewModel.lists[index!].tasks[indexPath.row]
+        
         // cell 뷰 적용
         // >> check
+        cell.btnCheck.isSelected = task.isDone
         cell.checkbutton(isDone: task.isDone)
         // >> text label
         cell.lblTask.text = task.title
@@ -114,29 +115,30 @@ extension ToDoListViewController: UITableViewDataSource {
         cell.btnImportant.isSelected = task.isImportant
         
         // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
-        
+
         cell.checkButtonTapHandler = { isDone in
             task.isDone = isDone
-            self.taskViewModel.updateTask(list.name, taskId: task.id, task: task)
+            // Important task의 경우 양쪽 list에 모두 데이더 업데이트
+            if self.index == 0 || task.isImportant {
+                self.taskViewModel.updateTask(listId: 1, taskId: task.id, task: task)
+                self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
+            }
+            self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
             self.tableView.reloadData()
-            print(task)
         }
         
         cell.importantButtonTapHandler = { isImportant in
             task.isImportant = isImportant
-            self.taskViewModel.updateTask(list.name, taskId: task.id, task: task)
+            self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
             
             // Important list에 대한 추가/삭제 적용
             if isImportant {
                 self.taskViewModel.addImportant(task)
             } else {
-                self.taskViewModel.unImportant(task.id)
+                self.taskViewModel.unImportant(listId: task.listId, taskId: task.id, task: task)
             }
-            
             self.tableView.reloadData()
-            print(task)
         }
-
         return cell
     }
 }

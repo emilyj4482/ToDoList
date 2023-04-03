@@ -36,7 +36,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="EmU-Nv-osD">
-                                <rect key="frame" x="20" y="131" width="335" height="596"/>
+                                <rect key="frame" x="20" y="131" width="335" height="569"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ListNameCell" id="SOE-ws-D2C" customClass="ListNameCell" customModule="ToDoList" customModuleProvider="target">
@@ -84,16 +84,24 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You have 0 custom lists." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dSh-Rg-dYn">
+                                <rect key="frame" x="30" y="710" width="156" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="cwF-Rz-LSk"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="dSh-Rg-dYn" firstAttribute="top" secondItem="EmU-Nv-osD" secondAttribute="bottom" constant="10" id="AKF-9C-kgu"/>
                             <constraint firstItem="luZ-Xg-JXG" firstAttribute="leading" secondItem="cwF-Rz-LSk" secondAttribute="leading" constant="30" id="G14-EZ-QC0"/>
                             <constraint firstItem="MBL-wq-COR" firstAttribute="top" secondItem="cwF-Rz-LSk" secondAttribute="top" constant="35" id="Kci-gu-0s7"/>
                             <constraint firstItem="EmU-Nv-osD" firstAttribute="centerX" secondItem="cwF-Rz-LSk" secondAttribute="centerX" id="STm-ys-9xo"/>
                             <constraint firstItem="cwF-Rz-LSk" firstAttribute="bottom" secondItem="luZ-Xg-JXG" secondAttribute="bottom" constant="20" id="cSZ-0W-TxI"/>
                             <constraint firstItem="cwF-Rz-LSk" firstAttribute="trailing" secondItem="EmU-Nv-osD" secondAttribute="trailing" constant="20" id="g7a-EI-yrb"/>
-                            <constraint firstItem="luZ-Xg-JXG" firstAttribute="top" secondItem="EmU-Nv-osD" secondAttribute="bottom" constant="10" id="kRQ-7r-LfT"/>
+                            <constraint firstItem="luZ-Xg-JXG" firstAttribute="top" secondItem="dSh-Rg-dYn" secondAttribute="bottom" constant="10" id="hGv-cd-5K2"/>
+                            <constraint firstItem="dSh-Rg-dYn" firstAttribute="leading" secondItem="cwF-Rz-LSk" secondAttribute="leading" constant="30" id="lkT-En-caK"/>
                             <constraint firstItem="EmU-Nv-osD" firstAttribute="top" secondItem="MBL-wq-COR" secondAttribute="bottom" constant="10" id="qrw-B3-E1w"/>
                             <constraint firstItem="EmU-Nv-osD" firstAttribute="leading" secondItem="cwF-Rz-LSk" secondAttribute="leading" constant="20" id="yqK-B9-gw0"/>
                             <constraint firstItem="MBL-wq-COR" firstAttribute="leading" secondItem="cwF-Rz-LSk" secondAttribute="leading" constant="30" id="zGr-b4-Sgf"/>
@@ -102,6 +110,7 @@
                     <navigationItem key="navigationItem" id="14h-RE-xPl"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
+                        <outlet property="lblCount" destination="dSh-Rg-dYn" id="CGw-nV-9nA"/>
                         <outlet property="tableView" destination="EmU-Nv-osD" id="3yW-CK-jpG"/>
                     </connections>
                 </viewController>
@@ -243,7 +252,7 @@
                                 <rect key="frame" x="0.0" y="728" width="375" height="50"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="gJI-Fv-Bkz">
-                                        <rect key="frame" x="30" y="15.999999999999998" width="20" height="18.666666666666664"/>
+                                        <rect key="frame" x="30" y="16" width="20" height="18.666666666666657"/>
                                         <color key="tintColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="20" id="GmF-8T-ewa"/>

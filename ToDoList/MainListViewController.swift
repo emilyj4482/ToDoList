@@ -10,6 +10,7 @@ import UIKit
 class MainListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var lblCount: UILabel!
     
     var taskViewModel = TaskViewModel.shared
     
@@ -25,8 +26,7 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         
         self.tableView.reloadData()
-        
-        print(taskViewModel.lists)
+        lblCount.text = "You have \(taskViewModel.lists.count - 1) custom lists."
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {

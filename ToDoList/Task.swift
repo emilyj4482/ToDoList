@@ -12,6 +12,7 @@ import Foundation
 // 할 일 Object
 struct Task {
     let id: Int
+    let listId: Int
     var title: String
     var isDone: Bool
     var isImportant: Bool
@@ -25,6 +26,7 @@ struct Task {
 
 // 리스트 Object
 struct List {
+    let id: Int
     var name: String
     var tasks: [Task]
 }
