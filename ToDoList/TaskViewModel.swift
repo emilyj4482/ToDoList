@@ -54,15 +54,22 @@ class TaskViewModel {
         }
     }
     
-    func deleteTask(_ taskId: Int) {
+    func deleteTask() {
         
     }
     
-    func updateTask() {
+    func updateTask(_ listName: String, taskId: Int) {
+        if let index1 = lists.firstIndex(where: { $0.name == listName }) {
+            if let index2 = lists[index1].tasks.firstIndex(where: { $0.id == taskId }) {
+                var task = lists[index1].tasks[index2]
+                // .... //
+            }
+            
+        }
         
     }
     
-    func deleteList(_ list: List) {
+    func deleteList() {
         
     }
     

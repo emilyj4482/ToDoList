@@ -97,15 +97,16 @@ extension ToDoListViewController: UITableViewDataSource {
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
         // cell 뷰 적용
-        // >> check
-        
-        // >> text label
         if let index = index {
+            // >> check
+            cell.checkbutton(isDone: taskViewModel.lists[index].tasks[indexPath.row].isDone)
+            
+            // >> text label
             cell.lblTask.text = taskViewModel.lists[index].tasks[indexPath.row].title
+            
+            // >> important
+            cell.btnImportant.isSelected = taskViewModel.lists[index].tasks[indexPath.row].isImportant
         }
-        
-        // >> important
-        
         return cell
     }
 }
@@ -161,10 +162,24 @@ class ToDoCell: UITableViewCell {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
         btnCheck.isSelected = !btnCheck.isSelected
         
+        // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
+        checkbutton(isDone: btnCheck.isSelected)
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
         btnImportant.isSelected = !btnImportant.isSelected
+    }
+    
+    // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
+    func checkbutton(isDone: Bool) {
+        btnCheck.isSelected = isDone
+        if isDone {
+            lblTask.attributedText = NSAttributedString(string: lblTask.text!, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            lblTask.alpha = 0.5
+        } else {
+            lblTask.attributedText = NSAttributedString(string: lblTask.text!, attributes: [.paragraphStyle: NSParagraphStyle.default])
+            lblTask.alpha = 1
+        }
     }
 }
