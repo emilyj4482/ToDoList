@@ -25,8 +25,6 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         
         self.tableView.reloadData()
-        
-        print(taskViewModel.lists)
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
