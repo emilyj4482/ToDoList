@@ -143,6 +143,22 @@ extension ToDoListViewController: UITableViewDataSource {
         }
         return cell
     }
+    
+    // cell swipe 시 삭제
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let task = taskViewModel.lists[index!].tasks[indexPath.row]
+        
+        if editingStyle == .delete {
+            // important task인 경우 Important list와 속한 list 양쪽에서 삭제 처리 필요
+            if task.isImportant && self.index! == 0 {
+                taskViewModel.deleteTask(listId: task.listId, taskId: task.id)
+            } else if task.isImportant && self.index! > 0 {
+                taskViewModel.deleteTask(listId: 0, taskId: task.id)
+            }
+            taskViewModel.deleteTask(listId: listId!, taskId: task.id)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+    }
 }
 
 // Table View Delegate
@@ -153,7 +169,7 @@ extension ToDoListViewController: UITableViewDelegate {
     }
 }
 
-// Keyboard 관련 기능 : textfield를 포함한 view가 키보드 팝업 시 바로 위에 위치하도록 구현
+// Keyboard 관련 기능 : 1) Keyboard 노출 = Done button 노출 2) Add a Task 버튼 클릭 시 textfield를 포함한 view가 키보드 바로 위에 위치하도록 구현
 extension ToDoListViewController {
     // 키보드 detection
     func detectKeyboard() {

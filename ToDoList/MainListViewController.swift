@@ -94,9 +94,11 @@ extension MainListViewController: UITableViewDataSource {
         let listId = taskViewModel.lists[indexPath.row].id
         
         if indexPath.row > 0 && editingStyle == . delete {
-            taskViewModel.lists.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
+            
+            
             taskViewModel.deleteList(listId: listId)
+            tableView.deleteRows(at: [indexPath], with: .fade)
         }
         // list count label 뷰 적용
         updateLblCount()

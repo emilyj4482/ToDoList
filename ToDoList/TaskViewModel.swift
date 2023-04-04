@@ -59,8 +59,12 @@ class TaskViewModel {
         }
     }
     
-    func deleteTask() {
-        
+    func deleteTask(listId: Int, taskId: Int) {
+        if let index1 = lists.firstIndex(where: { $0.id == listId }) {
+            if let index2 = lists[index1].tasks.firstIndex(where: { $0.id == taskId }) {
+                lists[index1].tasks.remove(at: index2)
+            }
+        }
     }
     
     func updateTask(listId: Int, taskId: Int, task: Task) {
