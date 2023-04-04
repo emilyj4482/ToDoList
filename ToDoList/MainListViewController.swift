@@ -91,15 +91,17 @@ extension MainListViewController: UITableViewDataSource {
     
     // cell swipe 시 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let listId = taskViewModel.lists[indexPath.row].id
+        let list = taskViewModel.lists[indexPath.row]
         
         if indexPath.row > 0 && editingStyle == . delete {
             // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
-            
-            
-            taskViewModel.deleteList(listId: listId)
+            if list.tasks.contains(where: { $0.isImportant }) {
+                taskViewModel.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
+            }
+            taskViewModel.deleteList(listId: list.id)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
+        tableView.reloadData()
         // list count label 뷰 적용
         updateLblCount()
     }
