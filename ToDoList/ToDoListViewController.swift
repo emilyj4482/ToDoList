@@ -167,6 +167,14 @@ extension ToDoListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
     }
+    
+    // row tap 시 동작
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
+        // TaskDetailViewController로 ViewModel 넘기면서 이동
+        taskDetailVC.taskViewModel = self.taskViewModel
+        self.navigationController?.pushViewController(taskDetailVC, animated: true)
+    }
 }
 
 // Keyboard 관련 기능 : 1) Keyboard 노출 = Done button 노출 2) Add a Task 버튼 클릭 시 textfield를 포함한 view가 키보드 바로 위에 위치하도록 구현
