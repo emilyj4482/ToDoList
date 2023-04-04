@@ -14,11 +14,11 @@ class TaskViewModel {
     static let shared = TaskViewModel()
     
     // Task.id 저장용 프로퍼티
-    var lastTaskId: Int = 0
+    private var lastTaskId: Int = 0
     // List.id 저장용 프로퍼티
-    var lastListId: Int = 1
+    private var lastListId: Int = 1
     // List 이름 중복 횟수 저장용 딕셔너리 [List이름: 중복 횟수]
-    var noOverlap: [String: Int] = [:]
+    private var noOverlap: [String: Int] = [:]
     
     // Important list는 고정값
     var lists: [List] = [List(id: 1, name: "Important", tasks: [])]
@@ -71,8 +71,10 @@ class TaskViewModel {
         }
     }
     
-    func deleteList() {
-        
+    func deleteList(listId: Int) {
+        if let index = lists.firstIndex(where: { $0.id == listId }) {
+            lists.remove(at: index)
+        }
     }
     
     func updateList() {
