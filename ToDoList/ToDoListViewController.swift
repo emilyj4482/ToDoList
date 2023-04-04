@@ -106,12 +106,9 @@ extension ToDoListViewController: UITableViewDataSource {
         var task: Task = taskViewModel.lists[index!].tasks[indexPath.row]
         
         // cell 뷰 적용
-        // >> check
         cell.btnCheck.isSelected = task.isDone
         cell.checkbutton(isDone: task.isDone)
-        // >> text label
         cell.lblTask.text = task.title
-        // >> important
         cell.btnImportant.isSelected = task.isImportant
         
         // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용

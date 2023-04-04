@@ -97,7 +97,6 @@ extension MainListViewController: UITableViewDataSource {
             taskViewModel.lists.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
             taskViewModel.deleteList(listId: listId)
-            print(taskViewModel.lists)
         }
         // list count label 뷰 적용
         updateLblCount()
