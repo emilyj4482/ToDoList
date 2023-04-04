@@ -186,11 +186,13 @@ extension ToDoListViewController {
     
     // keyboard 숨기기 : list name edit or add a task 상황인지에 따라 동작 분리
     @objc private func hideKeyBoard() {
+        // add a task : textfield를 비우고 영역 숨김
         if textField.isFirstResponder {
             textField.text = ""
-            textField.resignFirstResponder()
             tfView.isHidden = true
+            textField.resignFirstResponder()
         } else if lblListName.isFirstResponder {
+            // list name edit : done 버튼 탭이 아니라 단순히 다른 영역 tap인 경우 데이터 변동 X
             lblListName.text = taskViewModel.lists[index!].name
             lblListName.resignFirstResponder()
         }
