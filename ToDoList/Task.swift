@@ -29,4 +29,8 @@ struct List {
     let id: Int
     var name: String
     var tasks: [Task]
+    
+    mutating func update(name: String) {
+        self.name = name
+    }
 }

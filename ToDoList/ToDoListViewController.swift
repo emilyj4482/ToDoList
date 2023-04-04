@@ -77,11 +77,12 @@ class ToDoListViewController: UIViewController {
     // list name edit or add a task 상황에 따라 동작 분리
     @IBAction func btnDoneTapped(_ sender: UIButton) {
         guard let title = textField.text?.trim() else { return }
+        guard let name = lblListName.text?.trim() else { return }
         
         if textField.isFirstResponder && !title.isEmpty {
             taskViewModel.addTask(listId: listId!, taskViewModel.createTask(listId: listId!, title))
         } else if lblListName.isFirstResponder {
-            
+            taskViewModel.updateList(listId: listId!, name)
         }
         hideKeyBoard()
         self.tableView.reloadData()
@@ -190,6 +191,7 @@ extension ToDoListViewController {
             textField.resignFirstResponder()
             tfView.isHidden = true
         } else if lblListName.isFirstResponder {
+            lblListName.text = taskViewModel.lists[index!].name
             lblListName.resignFirstResponder()
         }
     }

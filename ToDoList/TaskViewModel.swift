@@ -77,8 +77,10 @@ class TaskViewModel {
         }
     }
     
-    func updateList() {
-        
+    func updateList(listId: Int, _ name: String) {
+        if let index = lists.firstIndex(where: { $0.id == listId }) {
+            lists[index].update(name: name)
+        }
     }
     
     func addImportant(_ task: Task) {
