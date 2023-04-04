@@ -26,13 +26,7 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         
         self.tableView.reloadData()
-        
-        let count = taskViewModel.lists.count - 1
-        if count <= 1 {
-            lblCount.text = "You have \(count) custom list."
-        } else {
-            lblCount.text = "You have \(count) custom lists."
-        }
+        updateLblCount()
     }
     
     @IBAction func btnNewListTapped(_ sender: UIButton) {
@@ -40,6 +34,16 @@ class MainListViewController: UIViewController {
         // AddNewListViewController로 ViewModel 넘기면서 이동
         addNewListVC.taskViewModel = self.taskViewModel
         self.navigationController?.pushViewController(addNewListVC, animated: true)
+    }
+    
+    // list count label 뷰 적용
+    func updateLblCount() {
+        let count = taskViewModel.lists.count - 1
+        if count <= 1 {
+            lblCount.text = "You have \(count) custom list."
+        } else {
+            lblCount.text = "You have \(count) custom lists."
+        }
     }
 }
 
@@ -74,6 +78,32 @@ extension MainListViewController: UITableViewDataSource {
             cell.lblTaskCount.text = String(list.tasks.count)
         }
         return cell
+    }
+    
+    // Important list swipe 불가 처리
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        if indexPath.row == 0 {
+            return UITableViewCell.EditingStyle.none
+        } else {
+            return UITableViewCell.EditingStyle.delete
+        }
+    }
+    
+    // cell swipe 시 삭제
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let list = taskViewModel.lists[indexPath.row]
+        
+        if indexPath.row > 0 && editingStyle == . delete {
+            // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
+            if list.tasks.contains(where: { $0.isImportant }) {
+                taskViewModel.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
+            }
+            taskViewModel.deleteList(listId: list.id)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        tableView.reloadData()
+        // list count label 뷰 적용
+        updateLblCount()
     }
 }
 

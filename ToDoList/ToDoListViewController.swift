@@ -15,7 +15,7 @@ class ToDoListViewController: UIViewController {
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var btnDone: UIButton!
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
-    @IBOutlet weak var lblListName: UILabel!
+    @IBOutlet weak var lblListName: UITextField!
     
     var taskViewModel = TaskViewModel.shared
     var index: Int?
@@ -39,8 +39,11 @@ class ToDoListViewController: UIViewController {
         self.lblListName.text = taskViewModel.lists[index].name
         
         // Important list의 경우 star icon을 통해서만 task를 추가할 수 있도록 구현 >> Add a Task 기능 비활성화
+        // Important list가 아닐 경우 label(textfield) 탭 시 edit 가능
         if index == 0 {
             btnAddTask.isHidden = true
+        } else {
+            lblListName.isEnabled = true
         }
     }
     
@@ -71,12 +74,15 @@ class ToDoListViewController: UIViewController {
         self.navigationController?.popViewController(animated: true)
     }
     
+    // list name edit or add a task 상황에 따라 동작 분리
     @IBAction func btnDoneTapped(_ sender: UIButton) {
         guard let title = textField.text?.trim() else { return }
-        if title.isEmpty {
-            hideKeyBoard()
-        } else {
+        guard let name = lblListName.text?.trim() else { return }
+        
+        if textField.isFirstResponder && !title.isEmpty {
             taskViewModel.addTask(listId: listId!, taskViewModel.createTask(listId: listId!, title))
+        } else if lblListName.isFirstResponder {
+            taskViewModel.updateList(listId: listId!, name)
         }
         hideKeyBoard()
         self.tableView.reloadData()
@@ -85,7 +91,6 @@ class ToDoListViewController: UIViewController {
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
     @IBAction func btnAddTapped(_ sender: UIButton) {
         tfView.isHidden = false
-        btnDone.isHidden = false
         textField.becomeFirstResponder()
     }
 }
@@ -106,12 +111,9 @@ extension ToDoListViewController: UITableViewDataSource {
         var task: Task = taskViewModel.lists[index!].tasks[indexPath.row]
         
         // cell 뷰 적용
-        // >> check
         cell.btnCheck.isSelected = task.isDone
         cell.checkbutton(isDone: task.isDone)
-        // >> text label
         cell.lblTask.text = task.title
-        // >> important
         cell.btnImportant.isSelected = task.isImportant
         
         // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
@@ -141,6 +143,22 @@ extension ToDoListViewController: UITableViewDataSource {
         }
         return cell
     }
+    
+    // cell swipe 시 삭제
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let task = taskViewModel.lists[index!].tasks[indexPath.row]
+        
+        if editingStyle == .delete {
+            // important task인 경우 Important list와 속한 list 양쪽에서 삭제 처리 필요
+            if task.isImportant && self.index! == 0 {
+                taskViewModel.deleteTask(listId: task.listId, taskId: task.id)
+            } else if task.isImportant && self.index! > 0 {
+                taskViewModel.deleteTask(listId: 0, taskId: task.id)
+            }
+            taskViewModel.deleteTask(listId: listId!, taskId: task.id)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+    }
 }
 
 // Table View Delegate
@@ -151,7 +169,7 @@ extension ToDoListViewController: UITableViewDelegate {
     }
 }
 
-// Keyboard 관련 기능 : textfield를 포함한 view가 키보드 팝업 시 바로 위에 위치하도록 구현
+// Keyboard 관련 기능 : 1) Keyboard 노출 = Done button 노출 2) Add a Task 버튼 클릭 시 textfield를 포함한 view가 키보드 바로 위에 위치하도록 구현
 extension ToDoListViewController {
     // 키보드 detection
     func detectKeyboard() {
@@ -169,19 +187,31 @@ extension ToDoListViewController {
         let adjustmentHeight = keyboardHeight - view.safeAreaInsets.bottom
         // 적용할 높이만큼 textfield 영역 높임
         tfViewBottom.constant = adjustmentHeight
+        
+        // Done button 노출
+        btnDone.isHidden = false
     }
     
     // textfield 영역 높이 원점
     @objc private func keyboardWillHide() {
         tfViewBottom.constant = 0
+        
+        // Done Button 숨김
+        btnDone.isHidden = true
     }
     
-    // keyboard 숨기기 + textfield를 비운 뒤 done 버튼과 함께 숨김
+    // keyboard 숨기기 : list name edit or add a task 상황인지에 따라 동작 분리
     @objc private func hideKeyBoard() {
-        textField.text = ""
-        textField.resignFirstResponder()
-        tfView.isHidden = true
-        btnDone.isHidden = true
+        // add a task : textfield를 비우고 영역 숨김
+        if textField.isFirstResponder {
+            textField.text = ""
+            tfView.isHidden = true
+            textField.resignFirstResponder()
+        } else if lblListName.isFirstResponder {
+            // list name edit : done 버튼 탭이 아니라 단순히 다른 영역 tap인 경우 데이터 변동 X
+            lblListName.text = taskViewModel.lists[index!].name
+            lblListName.resignFirstResponder()
+        }
     }
 }
 

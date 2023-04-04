@@ -14,11 +14,11 @@ class TaskViewModel {
     static let shared = TaskViewModel()
     
     // Task.id 저장용 프로퍼티
-    var lastTaskId: Int = 0
+    private var lastTaskId: Int = 0
     // List.id 저장용 프로퍼티
-    var lastListId: Int = 1
+    private var lastListId: Int = 1
     // List 이름 중복 횟수 저장용 딕셔너리 [List이름: 중복 횟수]
-    var noOverlap: [String: Int] = [:]
+    private var noOverlap: [String: Int] = [:]
     
     // Important list는 고정값
     var lists: [List] = [List(id: 1, name: "Important", tasks: [])]
@@ -59,8 +59,12 @@ class TaskViewModel {
         }
     }
     
-    func deleteTask() {
-        
+    func deleteTask(listId: Int, taskId: Int) {
+        if let index1 = lists.firstIndex(where: { $0.id == listId }) {
+            if let index2 = lists[index1].tasks.firstIndex(where: { $0.id == taskId }) {
+                lists[index1].tasks.remove(at: index2)
+            }
+        }
     }
     
     func updateTask(listId: Int, taskId: Int, task: Task) {
@@ -71,12 +75,16 @@ class TaskViewModel {
         }
     }
     
-    func deleteList() {
-        
+    func deleteList(listId: Int) {
+        if let index = lists.firstIndex(where: { $0.id == listId }) {
+            lists.remove(at: index)
+        }
     }
     
-    func updateList() {
-        
+    func updateList(listId: Int, _ name: String) {
+        if let index = lists.firstIndex(where: { $0.id == listId }) {
+            lists[index].update(name: name)
+        }
     }
     
     func addImportant(_ task: Task) {
