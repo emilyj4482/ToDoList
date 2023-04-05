@@ -20,6 +20,7 @@ class ToDoListViewController: UIViewController {
     var taskViewModel = TaskViewModel.shared
     var index: Int?
     var listId: Int?
+    var tapGestureRecognizer = UITapGestureRecognizer()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +30,10 @@ class ToDoListViewController: UIViewController {
         // keyboard detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
-        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
+        tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        // tableview cell에 대한 touch가 인식되도록 처리
+        tapGestureRecognizer.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGestureRecognizer)
 
         // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
         guard let index = index else { return }
@@ -84,7 +88,7 @@ class ToDoListViewController: UIViewController {
         } else if lblListName.isFirstResponder {
             taskViewModel.updateList(listId: listId!, name)
         }
-        hideKeyBoard()
+        hideKeyboard()
         self.tableView.reloadData()
     }
     
@@ -198,6 +202,9 @@ extension ToDoListViewController {
         
         // Done button 노출
         btnDone.isHidden = false
+        
+        // 키보드가 올라온 상태에서는 view touch cancel (이렇게 하지 않으면 Done 버튼을 눌러도 그냥 view touch로 인식되어 버튼 기능이 작동하지 않는다)
+        tapGestureRecognizer.cancelsTouchesInView = true
     }
     
     // textfield 영역 높이 원점
@@ -206,10 +213,13 @@ extension ToDoListViewController {
         
         // Done Button 숨김
         btnDone.isHidden = true
+        
+        // 키보드가 내려가면서 view touch 활성화 (tableview cell에 대한 touch 인식하도록 처리)
+        tapGestureRecognizer.cancelsTouchesInView = false
     }
     
     // keyboard 숨기기 : list name edit or add a task 상황인지에 따라 동작 분리
-    @objc private func hideKeyBoard() {
+    @objc private func hideKeyboard() {
         // add a task : textfield를 비우고 영역 숨김
         if textField.isFirstResponder {
             textField.text = ""

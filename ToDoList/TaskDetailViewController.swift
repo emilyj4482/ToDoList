@@ -21,7 +21,7 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func btnBackTapped(_ sender: UIButton) {
-        
+        self.navigationController?.popViewController(animated: true)
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
