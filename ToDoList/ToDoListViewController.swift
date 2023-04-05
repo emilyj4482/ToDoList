@@ -35,7 +35,7 @@ class ToDoListViewController: UIViewController {
         tapGestureRecognizer.cancelsTouchesInView = false
         self.view.addGestureRecognizer(tapGestureRecognizer)
 
-        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
+        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list의 id 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
         guard let index = index else { return }
         listId = taskViewModel.lists[index].id
         
@@ -71,23 +71,24 @@ class ToDoListViewController: UIViewController {
         }
     }
     
+    // Lists 버튼 : MainViewController로 돌아간다.
     @IBAction func btnListsTapped(_ sender: UIButton) {
-        // ViewModel 넘기면서 Main으로 이동
-        guard let mainListVC = self.storyboard?.instantiateViewController(identifier: "MainListViewController") as? MainListViewController else { return }
-        mainListVC.taskViewModel = self.taskViewModel
         self.navigationController?.popViewController(animated: true)
     }
     
-    // list name edit or add a task 상황에 따라 동작 분리
+    // Done 버튼 : list name을 tap하거나, + Add a Task 버튼을 tap했을 때 노출된다. 상황에 따라 동작이 분리된다.
     @IBAction func btnDoneTapped(_ sender: UIButton) {
         guard let title = textField.text?.trim() else { return }
         guard let name = lblListName.text?.trim() else { return }
         
+        // list name 수정 : 입력된 값으로 list 이름 update
+        // task 추가 : 입력된 값으로 task create & add
         if textField.isFirstResponder && !title.isEmpty {
             taskViewModel.addTask(listId: listId!, taskViewModel.createTask(listId: listId!, title))
         } else if lblListName.isFirstResponder {
             taskViewModel.updateList(listId: listId!, name)
         }
+        // 공동 동작 : 키보드 숨김
         hideKeyboard()
         self.tableView.reloadData()
     }
@@ -157,7 +158,7 @@ extension ToDoListViewController: UITableViewDataSource {
             if task.isImportant && self.index! == 0 {
                 taskViewModel.deleteTask(listId: task.listId, taskId: task.id)
             } else if task.isImportant && self.index! > 0 {
-                taskViewModel.deleteTask(listId: 0, taskId: task.id)
+                taskViewModel.deleteTask(listId: 1, taskId: task.id)
             }
             taskViewModel.deleteTask(listId: listId!, taskId: task.id)
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -172,11 +173,9 @@ extension ToDoListViewController: UITableViewDelegate {
         return 50
     }
     
-    // row tap 시 동작
+    // row tap 시 동작 : 해당 task의 상세화면(TaskDetailViewController)으로 이동
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
-        // TaskDetailViewController로 ViewModel 넘기면서 이동
-        taskDetailVC.taskViewModel = self.taskViewModel
         self.navigationController?.pushViewController(taskDetailVC, animated: true)
     }
 }

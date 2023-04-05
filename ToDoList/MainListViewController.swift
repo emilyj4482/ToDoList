@@ -29,10 +29,9 @@ class MainListViewController: UIViewController {
         updateLblCount()
     }
     
+    // + New List 버튼 tap 시 AddNewListViewController로 이동
     @IBAction func btnNewListTapped(_ sender: UIButton) {
         guard let addNewListVC = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
-        // AddNewListViewController로 ViewModel 넘기면서 이동
-        addNewListVC.taskViewModel = self.taskViewModel
         self.navigationController?.pushViewController(addNewListVC, animated: true)
     }
     
@@ -114,11 +113,10 @@ extension MainListViewController: UITableViewDelegate {
         return 50
     }
     
-    // row tap 시 동작
+    // row tap 시 동작 : 해당 list의 task 목록 화면(ToDoListViewController)으로 이동
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
-        // ToDoListViewController로 ViewModel 및 list 정보 넘기면서 이동
-        toDoListVC.taskViewModel = self.taskViewModel
+        // list의 index 정보를 같이 넘긴다.
         toDoListVC.index = indexPath.row
         self.navigationController?.pushViewController(toDoListVC, animated: true)
     }
