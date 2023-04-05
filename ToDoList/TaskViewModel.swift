@@ -60,13 +60,11 @@ class TaskViewModel {
     }
     
     // important task인 경우 Important list와 속한 list 양쪽에서 삭제 처리 필요
-    func deleteTaskComplete(listIndex: Int, listId: Int, task: Task) {
-        if task.isImportant && listIndex == 0 {
-            deleteSingleTask(listId: task.listId, taskId: task.id)
-        } else if task.isImportant && listIndex > 0 {
+    func deleteTaskComplete(_ task: Task) {
+        if task.isImportant {
             deleteSingleTask(listId: 1, taskId: task.id)
         }
-        deleteSingleTask(listId: listId, taskId: task.id)
+        deleteSingleTask(listId: task.listId, taskId: task.id)
     }
     
     private func deleteSingleTask(listId: Int, taskId: Int) {

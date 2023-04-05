@@ -142,7 +142,7 @@ extension ToDoListViewController: UITableViewDataSource {
         let task = taskViewModel.lists[index!].tasks[indexPath.row]
         
         if editingStyle == .delete {
-            taskViewModel.deleteTaskComplete(listIndex: index!, listId: listId!, task: task)
+            taskViewModel.deleteTaskComplete(task)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
