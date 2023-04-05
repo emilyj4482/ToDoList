@@ -68,7 +68,19 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func btnDeleteTapped(_ sender: UIButton) {
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        let task = taskViewModel.lists[listIndex].tasks[taskIndex]
         
+        // 삭제 여부를 확실하게 묻는 alert 호출
+        let alert = UIAlertController(title: "Delete task", message: "Are you sure you want to delete the task?", preferredStyle: .actionSheet)
+        let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            self.taskViewModel.deleteTaskComplete(listIndex: listIndex, listId: task.listId, task: task)
+            self.navigationController?.popViewController(animated: true)
+        })
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
+        alert.addAction(deleteButton)
+        alert.addAction(cancelButton)
+        self.present(alert, animated: true)
     }
     
     @IBAction func btnCheckTapped(_ sender: UIButton) {

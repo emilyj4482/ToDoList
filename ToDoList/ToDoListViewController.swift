@@ -154,13 +154,7 @@ extension ToDoListViewController: UITableViewDataSource {
         let task = taskViewModel.lists[index!].tasks[indexPath.row]
         
         if editingStyle == .delete {
-            // important task인 경우 Important list와 속한 list 양쪽에서 삭제 처리 필요
-            if task.isImportant && self.index! == 0 {
-                taskViewModel.deleteTask(listId: task.listId, taskId: task.id)
-            } else if task.isImportant && self.index! > 0 {
-                taskViewModel.deleteTask(listId: 1, taskId: task.id)
-            }
-            taskViewModel.deleteTask(listId: listId!, taskId: task.id)
+            taskViewModel.deleteTaskComplete(listIndex: index!, listId: listId!, task: task)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
