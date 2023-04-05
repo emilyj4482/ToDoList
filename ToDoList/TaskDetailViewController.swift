@@ -26,10 +26,10 @@ class TaskDetailViewController: UIViewController {
         
         // 이전 VC로부터 정보 전달 받기
         guard let taskIndex = taskIndex, let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let previousListName = previousListName else { return }
-        let currentList = taskViewModel.lists[listIndex]
+        let originalList = taskViewModel.lists[listIndex]
         
         // task 정보 view에 적용
-        configureUI(listName: currentList.name, task: currentList.tasks[taskIndex])
+        configureUI(listName: originalList.name, task: originalList.tasks[taskIndex])
 
         // Back 버튼 text에 이전 페이지 list 이름 적용
         btnBack.setTitle(" \(previousListName)", for: .normal)
@@ -64,7 +64,14 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func btnDoneTapped(_ sender: UIButton) {
-        hideKeyboard()
+        // 키보드 숨김 처리
+        lblTaskTitle.resignFirstResponder()
+        
+        // 데이터 update (view update는 textfield라 필요 X)
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text else { return }
+        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        task.title = taskTitle
+        taskViewModel.updateTaskComplete(task)
     }
     
     @IBAction func btnDeleteTapped(_ sender: UIButton) {
@@ -84,17 +91,32 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func btnCheckTapped(_ sender: UIButton) {
+        // view update
         btnCheck.isSelected = !btnCheck.isSelected
         checkbutton(isDone: btnCheck.isSelected)
+        
+        // 데이터 update
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        task.isDone = btnCheck.isSelected
+        taskViewModel.updateTaskComplete(task)
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {
+        // view update
         btnImportant.isSelected = !btnImportant.isSelected
+        
+        // 데이터 update
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        task.isImportant = btnImportant.isSelected
+        taskViewModel.updateImportant(task)
     }
 }
 
 // Keyboard 관련 기능 : 1) keyboard 노출 = Done 버튼 노출
 extension TaskDetailViewController {
+    
     // 키보드 detection
     func detectKeyboard() {
         // 키보드가 나타나는 것 감지 >> keyboardWillShow 함수 호출
@@ -111,8 +133,12 @@ extension TaskDetailViewController {
         btnDone.isHidden = true
     }
     
-    // 키보드 숨기기
+    // 키보드 숨기기 : done 버튼 tap이 아닌 단순 화면 tap이기 때문에 task title label이 원래대로 돌아오도록 처리
     @objc private func hideKeyboard() {
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        
         lblTaskTitle.resignFirstResponder()
+        lblTaskTitle.text = task.title
     }
 }

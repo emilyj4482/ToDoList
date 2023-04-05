@@ -125,25 +125,13 @@ extension ToDoListViewController: UITableViewDataSource {
 
         cell.checkButtonTapHandler = { isDone in
             task.isDone = isDone
-            // Important task의 경우 양쪽 list에 모두 데이더 업데이트
-            if self.index == 0 || task.isImportant {
-                self.taskViewModel.updateTask(listId: 1, taskId: task.id, task: task)
-                self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
-            }
-            self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
+            self.taskViewModel.updateTaskComplete(task)
             self.tableView.reloadData()
         }
         
         cell.importantButtonTapHandler = { isImportant in
             task.isImportant = isImportant
-            self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
-            
-            // Important list에 대한 추가/삭제 적용
-            if isImportant {
-                self.taskViewModel.addImportant(task)
-            } else {
-                self.taskViewModel.unImportant(listId: task.listId, taskId: task.id, task: task)
-            }
+            self.taskViewModel.updateImportant(task)
             self.tableView.reloadData()
         }
         return cell
