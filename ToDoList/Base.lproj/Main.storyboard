@@ -359,16 +359,21 @@
                                 <rect key="frame" x="30" y="85" width="315" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="foY-Xf-vxv">
-                                        <rect key="frame" x="0.0" y="10" width="19.666666666666668" height="30"/>
+                                        <rect key="frame" x="0.0" y="10" width="20" height="30"/>
                                         <constraints>
+                                            <constraint firstAttribute="width" constant="20" id="9GK-Ly-G7n"/>
                                             <constraint firstAttribute="height" constant="30" id="feB-GJ-dB1"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                         <color key="tintColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="circle" catalog="system">
                                             <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         </state>
+                                        <state key="selected" image="checkmark.circle.fill" catalog="system"/>
+                                        <connections>
+                                            <action selector="btnCheckTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="esP-8M-WZe"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q0Y-to-1pM">
                                         <rect key="frame" x="293" y="15" width="22" height="20"/>
@@ -379,9 +384,12 @@
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" image="star" catalog="system"/>
                                         <state key="selected" image="star.fill" catalog="system"/>
+                                        <connections>
+                                            <action selector="btnImportantTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="H69-9e-fhJ"/>
+                                        </connections>
                                     </button>
-                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="to study" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="0y1-jF-o5J">
-                                        <rect key="frame" x="29.666666666666671" y="12.33333333333333" width="253.33333333333331" height="25.666666666666671"/>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="to study" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="0y1-jF-o5J">
+                                        <rect key="frame" x="30" y="12.33333333333333" width="253" height="25.666666666666671"/>
                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="20"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
                                     </textField>
@@ -444,6 +452,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="btnBack" destination="hu2-WF-kru" id="5al-jp-EP5"/>
                         <outlet property="btnCheck" destination="foY-Xf-vxv" id="YUW-V8-4Uv"/>
                         <outlet property="btnImportant" destination="q0Y-to-1pM" id="vKC-OZ-yd5"/>
                         <outlet property="lblListName" destination="5gQ-or-fC9" id="lJ5-c1-tnT"/>

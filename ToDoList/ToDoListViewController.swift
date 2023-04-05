@@ -88,7 +88,7 @@ class ToDoListViewController: UIViewController {
         } else if lblListName.isFirstResponder {
             taskViewModel.updateList(listId: listId!, name)
         }
-        // 공동 동작 : 키보드 숨김
+        // 공통 동작 : 키보드 숨김
         hideKeyboard()
         self.tableView.reloadData()
     }
@@ -176,6 +176,10 @@ extension ToDoListViewController: UITableViewDelegate {
     // row tap 시 동작 : 해당 task의 상세화면(TaskDetailViewController)으로 이동
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
+        // 조회하는 task의 index, 속한 list id 및 현재 페이지의 list 이름을 함께 넘긴다. (Important일 경우 속한 list와 정보가 갈리기 때문에 따로 전송하는 것)
+        taskDetailVC.taskIndex = indexPath.row
+        taskDetailVC.listId = taskViewModel.lists[index!].tasks[indexPath.row].listId
+        taskDetailVC.previousListName = lblListName.text
         self.navigationController?.pushViewController(taskDetailVC, animated: true)
     }
 }
