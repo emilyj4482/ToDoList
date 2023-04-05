@@ -27,7 +27,7 @@ class ToDoListViewController: UIViewController {
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
-        // keyboard detection
+        // 키보드 detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
