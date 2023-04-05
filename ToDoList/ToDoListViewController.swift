@@ -20,18 +20,22 @@ class ToDoListViewController: UIViewController {
     var taskViewModel = TaskViewModel.shared
     var index: Int?
     var listId: Int?
+    var tapGestureRecognizer = UITapGestureRecognizer()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
-        // keyboard detection
+        // 키보드 detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
-        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyBoard)))
+        tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        // tableview cell에 대한 touch가 인식되도록 처리
+        tapGestureRecognizer.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGestureRecognizer)
 
-        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
+        // 이전 VC로부터 전달 받은 index 정보로 ViewModel에서 현재 list의 id 불러오기 >> viewDidLoad에서 값을 부여하므로 앞으로 forced unwrapping 적용
         guard let index = index else { return }
         listId = taskViewModel.lists[index].id
         
@@ -67,24 +71,25 @@ class ToDoListViewController: UIViewController {
         }
     }
     
+    // Lists 버튼 : MainViewController로 돌아간다.
     @IBAction func btnListsTapped(_ sender: UIButton) {
-        // ViewModel 넘기면서 Main으로 이동
-        guard let mainListVC = self.storyboard?.instantiateViewController(identifier: "MainListViewController") as? MainListViewController else { return }
-        mainListVC.taskViewModel = self.taskViewModel
         self.navigationController?.popViewController(animated: true)
     }
     
-    // list name edit or add a task 상황에 따라 동작 분리
+    // Done 버튼 : list name을 tap하거나, + Add a Task 버튼을 tap했을 때 노출된다. 상황에 따라 동작이 분리된다.
     @IBAction func btnDoneTapped(_ sender: UIButton) {
         guard let title = textField.text?.trim() else { return }
         guard let name = lblListName.text?.trim() else { return }
         
+        // list name 수정 : 입력된 값으로 list 이름 update
+        // task 추가 : 입력된 값으로 task create & add
         if textField.isFirstResponder && !title.isEmpty {
             taskViewModel.addTask(listId: listId!, taskViewModel.createTask(listId: listId!, title))
         } else if lblListName.isFirstResponder {
             taskViewModel.updateList(listId: listId!, name)
         }
-        hideKeyBoard()
+        // 공통 동작 : 키보드 숨김
+        hideKeyboard()
         self.tableView.reloadData()
     }
     
@@ -120,25 +125,13 @@ extension ToDoListViewController: UITableViewDataSource {
 
         cell.checkButtonTapHandler = { isDone in
             task.isDone = isDone
-            // Important task의 경우 양쪽 list에 모두 데이더 업데이트
-            if self.index == 0 || task.isImportant {
-                self.taskViewModel.updateTask(listId: 1, taskId: task.id, task: task)
-                self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
-            }
-            self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
+            self.taskViewModel.updateTaskComplete(task)
             self.tableView.reloadData()
         }
         
         cell.importantButtonTapHandler = { isImportant in
             task.isImportant = isImportant
-            self.taskViewModel.updateTask(listId: task.listId, taskId: task.id, task: task)
-            
-            // Important list에 대한 추가/삭제 적용
-            if isImportant {
-                self.taskViewModel.addImportant(task)
-            } else {
-                self.taskViewModel.unImportant(listId: task.listId, taskId: task.id, task: task)
-            }
+            self.taskViewModel.updateImportant(task)
             self.tableView.reloadData()
         }
         return cell
@@ -149,13 +142,7 @@ extension ToDoListViewController: UITableViewDataSource {
         let task = taskViewModel.lists[index!].tasks[indexPath.row]
         
         if editingStyle == .delete {
-            // important task인 경우 Important list와 속한 list 양쪽에서 삭제 처리 필요
-            if task.isImportant && self.index! == 0 {
-                taskViewModel.deleteTask(listId: task.listId, taskId: task.id)
-            } else if task.isImportant && self.index! > 0 {
-                taskViewModel.deleteTask(listId: 0, taskId: task.id)
-            }
-            taskViewModel.deleteTask(listId: listId!, taskId: task.id)
+            taskViewModel.deleteTaskComplete(listIndex: index!, listId: listId!, task: task)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
@@ -166,6 +153,16 @@ extension ToDoListViewController: UITableViewDelegate {
     // row 높이 지정
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
+    }
+    
+    // row tap 시 동작 : 해당 task의 상세화면(TaskDetailViewController)으로 이동
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
+        // 조회하는 task의 index, 속한 list id 및 현재 페이지의 list 이름을 함께 넘긴다. (Important일 경우 속한 list와 정보가 갈리기 때문에 따로 전송하는 것)
+        taskDetailVC.taskIndex = indexPath.row
+        taskDetailVC.listId = taskViewModel.lists[index!].tasks[indexPath.row].listId
+        taskDetailVC.previousListName = lblListName.text
+        self.navigationController?.pushViewController(taskDetailVC, animated: true)
     }
 }
 
@@ -190,6 +187,9 @@ extension ToDoListViewController {
         
         // Done button 노출
         btnDone.isHidden = false
+        
+        // 키보드가 올라온 상태에서는 view touch cancel (이렇게 하지 않으면 Done 버튼을 눌러도 그냥 view touch로 인식되어 버튼 기능이 작동하지 않는다)
+        tapGestureRecognizer.cancelsTouchesInView = true
     }
     
     // textfield 영역 높이 원점
@@ -198,10 +198,13 @@ extension ToDoListViewController {
         
         // Done Button 숨김
         btnDone.isHidden = true
+        
+        // 키보드가 내려가면서 view touch 활성화 (tableview cell에 대한 touch 인식하도록 처리)
+        tapGestureRecognizer.cancelsTouchesInView = false
     }
     
     // keyboard 숨기기 : list name edit or add a task 상황인지에 따라 동작 분리
-    @objc private func hideKeyBoard() {
+    @objc private func hideKeyboard() {
         // add a task : textfield를 비우고 영역 숨김
         if textField.isFirstResponder {
             textField.text = ""
