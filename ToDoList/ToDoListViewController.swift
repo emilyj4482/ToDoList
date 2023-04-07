@@ -9,7 +9,8 @@ import UIKit
 
 class ToDoListViewController: UIViewController {
 
-    @IBOutlet weak var tableView: UITableView!
+    // @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tfView: UIView!
     @IBOutlet weak var btnAddTask: UIButton!
     @IBOutlet weak var textField: UITextField!
@@ -23,8 +24,8 @@ class ToDoListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.dataSource = self
-        self.tableView.delegate = self
+        self.collectionView.dataSource = self
+        self.collectionView.delegate = self
         
         // 키보드 detection
         detectKeyboard()
@@ -48,7 +49,7 @@ class ToDoListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.tableView.reloadData()
+        self.collectionView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -88,7 +89,7 @@ class ToDoListViewController: UIViewController {
         }
         // 공통 동작 : 키보드 숨김
         hideKeyboard()
-        self.tableView.reloadData()
+        self.collectionView.reloadData()
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
@@ -98,8 +99,50 @@ class ToDoListViewController: UIViewController {
     }
 }
 
-// Table View Data Source
-extension ToDoListViewController: UITableViewDataSource {
+// Collection View Data Source
+extension ToDoListViewController: UICollectionViewDataSource {
+    
+    // section 개수 : task Done 발생 시 2개 아니면 1개
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    // section 별 item 개수 : isDone 상태에 따라 구별
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        guard let index = index else { return 0 }
+        return taskViewModel.lists[index].tasks.count
+    }
+    
+    // cell 지정
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UICollectionViewCell() }
+        
+        guard let index = index else { return UICollectionViewCell() }
+        var task: Task = taskViewModel.lists[index].tasks[indexPath.item]
+        
+        // cell 뷰 적용
+        cell.btnCheck.isSelected = task.isDone
+        cell.checkbutton(isDone: task.isDone)
+        cell.lblTask.text = task.title
+        cell.btnImportant.isSelected = task.isImportant
+        
+        // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
+
+        cell.checkButtonTapHandler = { isDone in
+            task.isDone = isDone
+            self.taskViewModel.updateTaskComplete(task)
+            self.collectionView.reloadData()
+        }
+        
+        cell.importantButtonTapHandler = { isImportant in
+            task.isImportant = isImportant
+            self.taskViewModel.updateImportant(task)
+            self.collectionView.reloadData()
+        }
+        return cell
+    }
+    
+    /*
     // row 개수 = 생성한 task 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let index = index else { return 0 }
@@ -126,17 +169,17 @@ extension ToDoListViewController: UITableViewDataSource {
         cell.checkButtonTapHandler = { isDone in
             task.isDone = isDone
             self.taskViewModel.updateTaskComplete(task)
-            self.tableView.reloadData()
+            self.collectionView.reloadData()
         }
         
         cell.importantButtonTapHandler = { isImportant in
             task.isImportant = isImportant
             self.taskViewModel.updateImportant(task)
-            self.tableView.reloadData()
+            self.collectionView.reloadData()
         }
         return cell
     }
-    
+     
     // cell swipe 시 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         guard let index = index else { return }
@@ -146,11 +189,16 @@ extension ToDoListViewController: UITableViewDataSource {
             taskViewModel.deleteTaskComplete(task)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
-    }
+    } */
 }
 
 // Table View Delegate
-extension ToDoListViewController: UITableViewDelegate {
+extension ToDoListViewController: UICollectionViewDelegate {
+    
+    
+    
+    
+    /*
     // row 높이 지정
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
@@ -165,8 +213,10 @@ extension ToDoListViewController: UITableViewDelegate {
         taskDetailVC.listId = taskViewModel.lists[index].tasks[indexPath.row].listId
         taskDetailVC.previousListName = lblListName.text
         self.navigationController?.pushViewController(taskDetailVC, animated: true)
-    }
+    } */
 }
+
+
 
 // Keyboard 관련 기능 : 1) Keyboard 노출 = Done button 노출 2) Add a Task 버튼 클릭 시 textfield를 포함한 view가 키보드 바로 위에 위치하도록 구현
 extension ToDoListViewController {
@@ -221,7 +271,7 @@ extension ToDoListViewController {
     }
 }
 
-class ToDoCell: UITableViewCell {
+class ToDoCell: UICollectionViewCell {
     @IBOutlet weak var btnCheck: UIButton!
     @IBOutlet weak var lblTask: UILabel!
     @IBOutlet weak var btnImportant: UIButton!
