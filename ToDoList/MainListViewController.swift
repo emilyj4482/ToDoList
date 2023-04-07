@@ -110,7 +110,7 @@ extension MainListViewController: UITableViewDataSource {
 extension MainListViewController: UITableViewDelegate {
     // row 높이 지정
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+        return 55
     }
     
     // row tap 시 동작 : 해당 list의 task 목록 화면(ToDoListViewController)으로 이동
