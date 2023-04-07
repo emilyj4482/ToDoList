@@ -193,8 +193,12 @@ extension ToDoListViewController: UICollectionViewDataSource {
 }
 
 // Table View Delegate
-extension ToDoListViewController: UICollectionViewDelegate {
-    
+extension ToDoListViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width
+        let height: CGFloat = 50
+        return CGSize(width: width, height: height)
+    }
     
     
     
