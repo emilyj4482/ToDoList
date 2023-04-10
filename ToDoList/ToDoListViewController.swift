@@ -122,12 +122,20 @@ extension ToDoListViewController: UICollectionViewDataSource {
         }
     }
     
-    // cell 지정
+    // cell 지정 : task done 여부에 따라 section 분리
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UICollectionViewCell() }
         
         guard let index = index else { return UICollectionViewCell() }
-        var task: Task = taskViewModel.lists[index].tasks[indexPath.item]
+        let tasks = taskViewModel.lists[index].tasks
+        var task: Task
+        // = taskViewModel.lists[index].tasks[indexPath.item]
+        
+        if indexPath.section == 0 {
+            task = taskViewModel.unDoneTasks(tasks: tasks)[indexPath.item]
+        } else {
+            task = taskViewModel.isDoneTasks(tasks: tasks)[indexPath.item]
+        }
         
         // cell 뷰 적용
         cell.btnCheck.isSelected = task.isDone
@@ -184,6 +192,18 @@ extension ToDoListViewController: UICollectionViewDelegateFlowLayout {
         let width = collectionView.bounds.width
         let height: CGFloat = 40
         return CGSize(width: width, height: height)
+    }
+    
+    // header 크기 지정
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let width = collectionView.bounds.width
+        // 아직 header title text가 없으므로 임시로 구분감을 주기 위한 값
+        let height: CGFloat = 100
+        if section == 1 {
+            return CGSize(width: width, height: height)
+        } else {
+            return CGSize(width: 0, height: 0)
+        }
     }
 }
 
