@@ -104,13 +104,22 @@ extension ToDoListViewController: UICollectionViewDataSource {
     
     // section 개수 : task Done 발생 시 2개 아니면 1개
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        guard let index = index else { return 0 }
+        if taskViewModel.lists[index].tasks.firstIndex(where: { $0.isDone == true }) != nil {
+            return 2
+        } else {
+            return 1
+        }
     }
     
     // section 별 item 개수 : isDone 상태에 따라 구별
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let index = index else { return 0 }
-        return taskViewModel.lists[index].tasks.count
+        if section == 0 {
+            return taskViewModel.lists[index].tasks.filter({ $0.isDone == false }).count
+        } else {
+            return taskViewModel.lists[index].tasks.filter({ $0.isDone == true }).count
+        }
     }
     
     // cell 지정
