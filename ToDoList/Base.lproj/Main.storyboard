@@ -413,13 +413,13 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="ooy-Vw-p94">
                                     <size key="itemSize" width="128" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="headerReferenceSize" width="50" height="30"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ToDoCell" id="Oo8-y8-L7L" customClass="ToDoCell" customModule="ToDoList" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="50"/>
+                                        <rect key="frame" x="0.0" y="30" width="335" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ydp-w1-Bqe">
                                             <rect key="frame" x="0.0" y="0.0" width="335" height="50"/>
@@ -479,6 +479,22 @@
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
+                                <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="TaskDoneHeader" id="3XB-KB-aNh" customClass="TaskDoneHeader" customModule="ToDoList" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="335" height="30"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000000000000004" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="tasks done!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pdi-bN-Q24">
+                                            <rect key="frame" x="10" y="6.6666666666666679" width="74.666666666666671" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="pdi-bN-Q24" firstAttribute="centerY" secondItem="3XB-KB-aNh" secondAttribute="centerY" id="SiO-5k-n3U"/>
+                                        <constraint firstItem="pdi-bN-Q24" firstAttribute="leading" secondItem="3XB-KB-aNh" secondAttribute="leading" constant="10" id="g8a-Ut-4ro"/>
+                                    </constraints>
+                                </collectionReusableView>
                             </collectionView>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LSt-PC-rFI">
                                 <rect key="frame" x="0.0" y="728" width="375" height="50"/>

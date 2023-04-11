@@ -158,6 +158,17 @@ extension ToDoListViewController: UICollectionViewDataSource {
         }
         return cell
     }
+    
+    // header view 지정
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "TaskDoneHeader", for: indexPath) as? TaskDoneHeader else { return UICollectionReusableView() }
+            return header
+        default:
+            return UICollectionReusableView()
+        }
+    }
 
     /*
     // cell swipe 시 삭제
@@ -190,15 +201,14 @@ extension ToDoListViewController: UICollectionViewDelegateFlowLayout {
     // cell 크기 지정
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = collectionView.bounds.width
-        let height: CGFloat = 40
+        let height: CGFloat = 30
         return CGSize(width: width, height: height)
     }
     
-    // header 크기 지정
+    // header 크기 지정 : section 0은 header 안보이게 하고, section 1만 보이게
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let width = collectionView.bounds.width
-        // 아직 header title text가 없으므로 임시로 구분감을 주기 위한 값
-        let height: CGFloat = 100
+        let height: CGFloat = 35
         if section == 1 {
             return CGSize(width: width, height: height)
         } else {
@@ -298,3 +308,5 @@ class ToDoCell: UICollectionViewCell {
         }
     }
 }
+
+class TaskDoneHeader: UICollectionReusableView {}
