@@ -31,7 +31,7 @@ class ToDoListViewController: UIViewController {
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
-        // tableview cell에 대한 touch가 인식되도록 처리
+        // collectionview cell에 대한 touch가 인식되도록 처리
         tapGestureRecognizer.cancelsTouchesInView = false
         self.view.addGestureRecognizer(tapGestureRecognizer)
 
