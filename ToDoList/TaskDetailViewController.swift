@@ -67,9 +67,15 @@ class TaskDetailViewController: UIViewController {
         lblTaskTitle.resignFirstResponder()
         
         // 데이터 update (view update는 textfield라 필요 X)
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text else { return }
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text?.trim() else { return }
         var task = taskViewModel.lists[listIndex].tasks[taskIndex]
-        task.title = taskTitle
+        // textfield 공백 시 수정 적용 X
+        if taskTitle.isEmpty {
+            lblTaskTitle.text = task.title
+        } else {
+            task.title = taskTitle
+            lblTaskTitle.text = taskTitle
+        }
         taskViewModel.updateTaskComplete(task)
     }
     

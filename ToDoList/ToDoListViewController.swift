@@ -78,14 +78,19 @@ class ToDoListViewController: UIViewController {
         guard let name = lblListName.text?.trim() else { return }
         
         guard let index = index else { return }
-        let listId = taskViewModel.lists[index].id
+        let list = taskViewModel.lists[index]
         
         // list name 수정 : 입력된 값으로 list 이름 update
         // task 추가 : 입력된 값으로 task create & add
         if textField.isFirstResponder && !title.isEmpty {
-            taskViewModel.addTask(listId: listId, taskViewModel.createTask(listId: listId, title))
+            taskViewModel.addTask(listId: list.id, taskViewModel.createTask(listId: list.id, title))
         } else if lblListName.isFirstResponder {
-            taskViewModel.updateList(listId: listId, name)
+            // 공백 입력 시 수정 적용 X
+            if name.isEmpty {
+                taskViewModel.updateList(listId: list.id, list.name)
+            } else {
+                taskViewModel.updateList(listId: list.id, name)
+            }
         }
         // 공통 동작 : 키보드 숨김
         hideKeyboard()
