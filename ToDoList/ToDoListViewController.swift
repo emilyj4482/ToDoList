@@ -9,7 +9,8 @@ import UIKit
 
 class ToDoListViewController: UIViewController {
 
-    @IBOutlet weak var tableView: UITableView!
+    // @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tfView: UIView!
     @IBOutlet weak var btnAddTask: UIButton!
     @IBOutlet weak var textField: UITextField!
@@ -23,14 +24,14 @@ class ToDoListViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.dataSource = self
-        self.tableView.delegate = self
+        self.collectionView.dataSource = self
+        self.collectionView.delegate = self
         
         // 키보드 detection
         detectKeyboard()
         // (입력 종료) 사용자의 화면 tap을 감지하여 keyboard 숨김
         tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
-        // tableview cell에 대한 touch가 인식되도록 처리
+        // collectionview cell에 대한 touch가 인식되도록 처리
         tapGestureRecognizer.cancelsTouchesInView = false
         self.view.addGestureRecognizer(tapGestureRecognizer)
 
@@ -48,7 +49,7 @@ class ToDoListViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.tableView.reloadData()
+        self.collectionView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -77,18 +78,23 @@ class ToDoListViewController: UIViewController {
         guard let name = lblListName.text?.trim() else { return }
         
         guard let index = index else { return }
-        let listId = taskViewModel.lists[index].id
+        let list = taskViewModel.lists[index]
         
         // list name 수정 : 입력된 값으로 list 이름 update
         // task 추가 : 입력된 값으로 task create & add
         if textField.isFirstResponder && !title.isEmpty {
-            taskViewModel.addTask(listId: listId, taskViewModel.createTask(listId: listId, title))
+            taskViewModel.addTask(listId: list.id, taskViewModel.createTask(listId: list.id, title))
         } else if lblListName.isFirstResponder {
-            taskViewModel.updateList(listId: listId, name)
+            // 공백 입력 시 수정 적용 X
+            if name.isEmpty {
+                taskViewModel.updateList(listId: list.id, list.name)
+            } else {
+                taskViewModel.updateList(listId: list.id, name)
+            }
         }
         // 공통 동작 : 키보드 숨김
         hideKeyboard()
-        self.tableView.reloadData()
+        self.collectionView.reloadData()
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
@@ -98,22 +104,42 @@ class ToDoListViewController: UIViewController {
     }
 }
 
-// Table View Data Source
-extension ToDoListViewController: UITableViewDataSource {
-    // row 개수 = 생성한 task 개수
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+// Collection View Data Source
+extension ToDoListViewController: UICollectionViewDataSource {
+    
+    // section 개수 : task Done 발생 시 2개 아니면 1개
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         guard let index = index else { return 0 }
-        return taskViewModel.lists[index].tasks.count
+        if taskViewModel.lists[index].tasks.firstIndex(where: { $0.isDone == true }) != nil {
+            return 2
+        } else {
+            return 1
+        }
     }
     
-    // cell 지정
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UITableViewCell() }
-        // cell tap 시 배경색 회색되지 않게
-        cell.selectionStyle = .none
+    // section 별 item 개수 : isDone 상태에 따라 구별
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let index = index else { return 0 }
+        if section == 0 {
+            return taskViewModel.unDoneTasks(listIndex: index).count
+        } else {
+            return taskViewModel.isDoneTasks(listIndex: index).count
+        }
+    }
+    
+    // cell 지정 : task done 여부에 따라 section 분리
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UICollectionViewCell() }
         
-        guard let index = index else { return UITableViewCell() }
-        var task: Task = taskViewModel.lists[index].tasks[indexPath.row]
+        guard let index = index else { return UICollectionViewCell() }
+        var task: Task
+        // = taskViewModel.lists[index].tasks[indexPath.item]
+        
+        if indexPath.section == 0 {
+            task = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item]
+        } else {
+            task = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item]
+        }
         
         // cell 뷰 적용
         cell.btnCheck.isSelected = task.isDone
@@ -126,17 +152,29 @@ extension ToDoListViewController: UITableViewDataSource {
         cell.checkButtonTapHandler = { isDone in
             task.isDone = isDone
             self.taskViewModel.updateTaskComplete(task)
-            self.tableView.reloadData()
+            self.collectionView.reloadData()
         }
         
         cell.importantButtonTapHandler = { isImportant in
             task.isImportant = isImportant
             self.taskViewModel.updateImportant(task)
-            self.tableView.reloadData()
+            self.collectionView.reloadData()
         }
         return cell
     }
     
+    // header view 지정
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "TaskDoneHeader", for: indexPath) as? TaskDoneHeader else { return UICollectionReusableView() }
+            return header
+        default:
+            return UICollectionReusableView()
+        }
+    }
+
+    /*
     // cell swipe 시 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         guard let index = index else { return }
@@ -146,25 +184,53 @@ extension ToDoListViewController: UITableViewDataSource {
             taskViewModel.deleteTaskComplete(task)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
+    } */
+}
+
+// Collection View Delegate
+extension ToDoListViewController: UICollectionViewDelegate {
+    // item tap 시 동작 : 해당 task의 상세화면(TaskDetailViewController)으로 이동
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
+        guard let index = index else { return }
+        
+        // section에 따라 task의 id 및 list id 추출
+        let taskId: Int
+        let listId: Int
+        if indexPath.section == 0 {
+            taskId = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item].id
+            listId = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item].listId
+        } else {
+            taskId = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item].id
+            listId = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item].listId
+        }
+        
+        // 추출한 task id로 tasks에서의 index, 속한 list id 정보를 가져와 현재 페이지의 list 이름과 함께 넘긴다.
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }) else { return }
+        taskDetailVC.taskIndex = taskViewModel.lists[listIndex].tasks.firstIndex(where: { $0.id == taskId })
+        taskDetailVC.listId = listId
+        taskDetailVC.previousListName = lblListName.text
+        self.navigationController?.pushViewController(taskDetailVC, animated: true)
     }
 }
 
-// Table View Delegate
-extension ToDoListViewController: UITableViewDelegate {
-    // row 높이 지정
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+extension ToDoListViewController: UICollectionViewDelegateFlowLayout {
+    // cell 크기 지정
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width = collectionView.bounds.width
+        let height: CGFloat = 30
+        return CGSize(width: width, height: height)
     }
     
-    // row tap 시 동작 : 해당 task의 상세화면(TaskDetailViewController)으로 이동
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
-        guard let index = index else { return }
-        // 조회하는 task의 index, 속한 list id 및 현재 페이지의 list 이름을 함께 넘긴다. (Important일 경우 속한 list와 정보가 갈리기 때문에 따로 전송하는 것)
-        taskDetailVC.taskIndex = indexPath.row
-        taskDetailVC.listId = taskViewModel.lists[index].tasks[indexPath.row].listId
-        taskDetailVC.previousListName = lblListName.text
-        self.navigationController?.pushViewController(taskDetailVC, animated: true)
+    // header 크기 지정 : section 0은 header 안보이게 하고, section 1만 보이게
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let width = collectionView.bounds.width
+        let height: CGFloat = 35
+        if section == 1 {
+            return CGSize(width: width, height: height)
+        } else {
+            return CGSize(width: 0, height: 0)
+        }
     }
 }
 
@@ -221,7 +287,7 @@ extension ToDoListViewController {
     }
 }
 
-class ToDoCell: UITableViewCell {
+class ToDoCell: UICollectionViewCell {
     @IBOutlet weak var btnCheck: UIButton!
     @IBOutlet weak var lblTask: UILabel!
     @IBOutlet weak var btnImportant: UIButton!
@@ -259,3 +325,5 @@ class ToDoCell: UITableViewCell {
         }
     }
 }
+
+class TaskDoneHeader: UICollectionReusableView {}

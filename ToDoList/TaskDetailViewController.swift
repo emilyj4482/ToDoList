@@ -43,18 +43,17 @@ class TaskDetailViewController: UIViewController {
     func configureUI(listName: String, task: Task) {
         btnCheck.isSelected = task.isDone
         btnImportant.isSelected = task.isImportant
-        lblTaskTitle.text = task.title
         lblListName.text = listName
-        checkbutton(isDone: task.isDone)
+        isTaskDone(isDone: task.isDone, string: task.title)
     }
     
     // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
-    func checkbutton(isDone: Bool) {
+    func isTaskDone(isDone: Bool, string: String) {
         if isDone {
-            lblTaskTitle.attributedText = NSAttributedString(string: lblTaskTitle.text!, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            lblTaskTitle.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
             lblTaskTitle.alpha = 0.5
         } else {
-            lblTaskTitle.attributedText = NSAttributedString(string: lblTaskTitle.text!, attributes: [.strikethroughStyle: NSUnderlineStyle()])
+            lblTaskTitle.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle()])
             lblTaskTitle.alpha = 1
         }
     }
@@ -68,9 +67,15 @@ class TaskDetailViewController: UIViewController {
         lblTaskTitle.resignFirstResponder()
         
         // 데이터 update (view update는 textfield라 필요 X)
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text else { return }
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text?.trim() else { return }
         var task = taskViewModel.lists[listIndex].tasks[taskIndex]
-        task.title = taskTitle
+        // textfield 공백 시 수정 적용 X
+        if taskTitle.isEmpty {
+            lblTaskTitle.text = task.title
+        } else {
+            task.title = taskTitle
+            lblTaskTitle.text = taskTitle
+        }
         taskViewModel.updateTaskComplete(task)
     }
     
@@ -91,30 +96,32 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func btnCheckTapped(_ sender: UIButton) {
-        // view update
-        btnCheck.isSelected = !btnCheck.isSelected
-        checkbutton(isDone: btnCheck.isSelected)
-        
-        // 데이터 update
         guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
         var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        
+        // view update
+        btnCheck.isSelected = !btnCheck.isSelected
+        isTaskDone(isDone: btnCheck.isSelected, string: task.title)
+        
+        // 데이터 update
         task.isDone = btnCheck.isSelected
         taskViewModel.updateTaskComplete(task)
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        
         // view update
         btnImportant.isSelected = !btnImportant.isSelected
         
         // 데이터 update
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
-        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
         task.isImportant = btnImportant.isSelected
         taskViewModel.updateImportant(task)
     }
 }
 
-// Keyboard 관련 기능 : 1) keyboard 노출 = Done 버튼 노출
+// Keyboard 관련 기능 : 1) keyboard 노출 = Done 버튼 노출, check, important 버튼 비활성화
 extension TaskDetailViewController {
     
     // 키보드 detection
@@ -127,18 +134,22 @@ extension TaskDetailViewController {
     
     @objc private func keyboardWillShow(notification: Notification) {
         btnDone.isHidden = false
+        btnCheck.isEnabled = false
+        btnImportant.isEnabled = false
     }
     
     @objc private func keyboardWillHide(notification: Notification) {
         btnDone.isHidden = true
+        btnCheck.isEnabled = true
+        btnImportant.isEnabled = true
     }
     
-    // 키보드 숨기기 : done 버튼 tap이 아닌 단순 화면 tap이기 때문에 task title label이 원래대로 돌아오도록 처리
+    // 키보드 숨기기 : done 버튼이 아닌 단순 화면 tap이기 때문에 입력이 발생하더라도 데이터 update되지 않고 task title label이 원래대로 돌아오도록 처리
     @objc private func hideKeyboard() {
         guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
-        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        let task = taskViewModel.lists[listIndex].tasks[taskIndex]
         
         lblTaskTitle.resignFirstResponder()
-        lblTaskTitle.text = task.title
+        isTaskDone(isDone: task.isDone, string: task.title)
     }
 }
