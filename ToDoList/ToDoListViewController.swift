@@ -116,9 +116,9 @@ extension ToDoListViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let index = index else { return 0 }
         if section == 0 {
-            return taskViewModel.lists[index].tasks.filter({ $0.isDone == false }).count
+            return taskViewModel.unDoneTasks(listIndex: index).count
         } else {
-            return taskViewModel.lists[index].tasks.filter({ $0.isDone == true }).count
+            return taskViewModel.isDoneTasks(listIndex: index).count
         }
     }
     
@@ -127,14 +127,13 @@ extension ToDoListViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UICollectionViewCell() }
         
         guard let index = index else { return UICollectionViewCell() }
-        let tasks = taskViewModel.lists[index].tasks
         var task: Task
         // = taskViewModel.lists[index].tasks[indexPath.item]
         
         if indexPath.section == 0 {
-            task = taskViewModel.unDoneTasks(tasks: tasks)[indexPath.item]
+            task = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item]
         } else {
-            task = taskViewModel.isDoneTasks(tasks: tasks)[indexPath.item]
+            task = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item]
         }
         
         // cell 뷰 적용
@@ -189,9 +188,22 @@ extension ToDoListViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let taskDetailVC = self.storyboard?.instantiateViewController(identifier: "TaskDetailViewController") as? TaskDetailViewController else { return }
         guard let index = index else { return }
-        // 조회하는 task의 index, 속한 list id 및 현재 페이지의 list 이름을 함께 넘긴다. (Important일 경우 속한 list와 정보가 갈리기 때문에 따로 전송하는 것)
-        taskDetailVC.taskIndex = indexPath.item
-        taskDetailVC.listId = taskViewModel.lists[index].tasks[indexPath.item].listId
+        
+        // section에 따라 task의 id 및 list id 추출
+        let taskId: Int
+        let listId: Int
+        if indexPath.section == 0 {
+            taskId = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item].id
+            listId = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item].listId
+        } else {
+            taskId = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item].id
+            listId = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item].listId
+        }
+        
+        // 추출한 task id로 tasks에서의 index, 속한 list id 정보를 가져와 현재 페이지의 list 이름과 함께 넘긴다.
+        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }) else { return }
+        taskDetailVC.taskIndex = taskViewModel.lists[listIndex].tasks.firstIndex(where: { $0.id == taskId })
+        taskDetailVC.listId = listId
         taskDetailVC.previousListName = lblListName.text
         self.navigationController?.pushViewController(taskDetailVC, animated: true)
     }

@@ -114,14 +114,14 @@ class TaskViewModel {
             lists[index].update(name: name)
         }
     }
-    
+
     // task.isDone 여부에 따라 section 분리
-    func unDoneTasks(tasks: [Task]) -> [Task] {
-        return tasks.filter({ $0.isDone == false })
+    func unDoneTasks(listIndex: Int) -> [Task] {
+        return lists[listIndex].tasks.filter({ $0.isDone == false })
     }
     
-    func isDoneTasks(tasks: [Task]) -> [Task] {
-        return tasks.filter({ $0.isDone == true })
+    func isDoneTasks(listIndex: Int) -> [Task] {
+        return lists[listIndex].tasks.filter({ $0.isDone == true })
     }
 }
 
