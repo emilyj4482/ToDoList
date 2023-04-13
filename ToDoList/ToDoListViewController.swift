@@ -9,7 +9,6 @@ import UIKit
 
 class ToDoListViewController: UIViewController {
 
-    // @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tfView: UIView!
     @IBOutlet weak var btnAddTask: UIButton!
@@ -133,7 +132,6 @@ extension ToDoListViewController: UICollectionViewDataSource {
         
         guard let index = index else { return UICollectionViewCell() }
         var task: Task
-        // = taskViewModel.lists[index].tasks[indexPath.item]
         
         if indexPath.section == 0 {
             task = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item]
@@ -173,18 +171,6 @@ extension ToDoListViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
     }
-
-    /*
-    // cell swipe 시 삭제
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard let index = index else { return }
-        let task = taskViewModel.lists[index].tasks[indexPath.row]
-        
-        if editingStyle == .delete {
-            taskViewModel.deleteTaskComplete(task)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        }
-    } */
 }
 
 // Collection View Delegate

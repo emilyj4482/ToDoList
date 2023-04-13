@@ -97,16 +97,16 @@ extension MainListViewController: UITableViewDataSource {
         if indexPath.row > 0 && editingStyle == .delete {
             // 삭제 여부를 확실하게 묻는 alert 호출
             let alert = UIAlertController(title: "Delete list", message: "Are you sure you want to delete the list?", preferredStyle: .actionSheet)
-            let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
                 // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
                 if list.tasks.contains(where: { $0.isImportant }) {
-                    self.taskViewModel.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
+                    self?.taskViewModel.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
                 }
-                self.taskViewModel.deleteList(listId: list.id)
+                self?.taskViewModel.deleteList(listId: list.id)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 tableView.reloadData()
                 // list count label 뷰 적용
-                self.updateLblCount()
+                self?.updateLblCount()
             })
             let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
             alert.addAction(deleteButton)

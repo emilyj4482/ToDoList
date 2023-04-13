@@ -85,9 +85,9 @@ class TaskDetailViewController: UIViewController {
         
         // 삭제 여부를 확실하게 묻는 alert 호출
         let alert = UIAlertController(title: "Delete task", message: "Are you sure you want to delete the task?", preferredStyle: .actionSheet)
-        let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            self.taskViewModel.deleteTaskComplete(task)
-            self.navigationController?.popViewController(animated: true)
+        let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
+            self?.taskViewModel.deleteTaskComplete(task)
+            self?.navigationController?.popViewController(animated: true)
         })
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
         alert.addAction(deleteButton)
