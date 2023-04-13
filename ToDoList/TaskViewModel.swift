@@ -21,7 +21,15 @@ class TaskViewModel {
     private var noOverlap: [String: Int] = [:]
     
     // Important list는 고정값
-    var lists: [List] = [List(id: 1, name: "Important", tasks: [])]
+    // lists에 변동이 생길 때마다 로컬에 저장 : didSet
+    var lists: [List] = [List(id: 1, name: "Important", tasks: [])] {
+        didSet {
+            saveData()
+        }
+    }
+    
+    // UserDefaults 저장 key 값
+    let dataKey: String = "dataKey"
     
     func createList(_ listName: String) -> List {
         let nextId = lastListId + 1
@@ -122,6 +130,21 @@ class TaskViewModel {
     
     func isDoneTasks(listIndex: Int) -> [Task] {
         return lists[listIndex].tasks.filter({ $0.isDone == true })
+    }
+    
+    // UserDefaults를 통해 데이터를 로컬에 저장, 불러오기
+    func saveData() {
+        if let encodedData = try? JSONEncoder().encode(lists) {
+            UserDefaults.standard.set(encodedData, forKey: dataKey)
+        }
+    }
+    
+    func getData() {
+        guard
+            let data = UserDefaults.standard.data(forKey: dataKey),
+            let savedData = try? JSONDecoder().decode([List].self, from: data)
+        else { return }
+        self.lists = savedData
     }
 }
 
