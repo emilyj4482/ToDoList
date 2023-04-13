@@ -10,7 +10,7 @@ import Foundation
 /* Model */
 
 // 할 일 Object
-struct Task {
+struct Task: Codable {
     let id: Int
     let listId: Int
     var title: String
@@ -25,7 +25,7 @@ struct Task {
 }
 
 // 리스트 Object
-struct List {
+struct List: Codable {
     let id: Int
     var name: String
     var tasks: [Task]

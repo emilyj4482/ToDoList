@@ -18,6 +18,8 @@ class MainListViewController: UIViewController {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
+        // 로컬에서 저장된 데이터 불러오기
+        taskViewModel.getData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
