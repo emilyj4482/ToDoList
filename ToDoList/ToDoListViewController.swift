@@ -17,7 +17,7 @@ class ToDoListViewController: UIViewController {
     @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
     @IBOutlet weak var lblListName: UITextField!
     
-    var taskViewModel = TaskViewModel.shared
+    var vm = TaskViewModel.shared
     var index: Int?
     var tapGestureRecognizer = UITapGestureRecognizer()
 
@@ -36,7 +36,7 @@ class ToDoListViewController: UIViewController {
 
         guard let index = index else { return }
         // list 이름 라벨에 적용
-        self.lblListName.text = taskViewModel.lists[index].name
+        self.lblListName.text = vm.lists[index].name
         // Important list의 경우 star icon을 통해서만 task를 추가할 수 있도록 구현 >> Add a Task 기능 비활성화
         // Important list가 아닐 경우 label(textfield) 탭 시 edit 가능
         if index == 0 {
@@ -77,18 +77,18 @@ class ToDoListViewController: UIViewController {
         guard let name = lblListName.text?.trim() else { return }
         
         guard let index = index else { return }
-        let list = taskViewModel.lists[index]
+        let list = vm.lists[index]
         
         // list name 수정 : 입력된 값으로 list 이름 update
         // task 추가 : 입력된 값으로 task create & add
         if textField.isFirstResponder && !title.isEmpty {
-            taskViewModel.addTask(listId: list.id, taskViewModel.createTask(listId: list.id, title))
+            vm.addTask(listId: list.id, vm.createTask(listId: list.id, title))
         } else if lblListName.isFirstResponder {
             // 공백 입력 시 수정 적용 X
             if name.isEmpty {
-                taskViewModel.updateList(listId: list.id, list.name)
+                vm.updateList(listId: list.id, list.name)
             } else {
-                taskViewModel.updateList(listId: list.id, name)
+                vm.updateList(listId: list.id, name)
             }
         }
         // 공통 동작 : 키보드 숨김
@@ -109,7 +109,7 @@ extension ToDoListViewController: UICollectionViewDataSource {
     // section 개수 : task Done 발생 시 2개 아니면 1개
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         guard let index = index else { return 0 }
-        if taskViewModel.lists[index].tasks.firstIndex(where: { $0.isDone == true }) != nil {
+        if vm.lists[index].tasks.firstIndex(where: { $0.isDone == true }) != nil {
             return 2
         } else {
             return 1
@@ -120,9 +120,9 @@ extension ToDoListViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let index = index else { return 0 }
         if section == 0 {
-            return taskViewModel.unDoneTasks(listIndex: index).count
+            return vm.unDoneTasks(listIndex: index).count
         } else {
-            return taskViewModel.isDoneTasks(listIndex: index).count
+            return vm.isDoneTasks(listIndex: index).count
         }
     }
     
@@ -134,9 +134,9 @@ extension ToDoListViewController: UICollectionViewDataSource {
         var task: Task
         
         if indexPath.section == 0 {
-            task = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item]
+            task = vm.unDoneTasks(listIndex: index)[indexPath.item]
         } else {
-            task = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item]
+            task = vm.isDoneTasks(listIndex: index)[indexPath.item]
         }
         
         // cell 뷰 적용
@@ -149,13 +149,13 @@ extension ToDoListViewController: UICollectionViewDataSource {
 
         cell.checkButtonTapHandler = { isDone in
             task.isDone = isDone
-            self.taskViewModel.updateTaskComplete(task)
+            self.vm.updateTaskComplete(task)
             self.collectionView.reloadData()
         }
         
         cell.importantButtonTapHandler = { isImportant in
             task.isImportant = isImportant
-            self.taskViewModel.updateImportant(task)
+            self.vm.updateImportant(task)
             self.collectionView.reloadData()
         }
         return cell
@@ -184,16 +184,16 @@ extension ToDoListViewController: UICollectionViewDelegate {
         let taskId: Int
         let listId: Int
         if indexPath.section == 0 {
-            taskId = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item].id
-            listId = taskViewModel.unDoneTasks(listIndex: index)[indexPath.item].listId
+            taskId = vm.unDoneTasks(listIndex: index)[indexPath.item].id
+            listId = vm.unDoneTasks(listIndex: index)[indexPath.item].listId
         } else {
-            taskId = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item].id
-            listId = taskViewModel.isDoneTasks(listIndex: index)[indexPath.item].listId
+            taskId = vm.isDoneTasks(listIndex: index)[indexPath.item].id
+            listId = vm.isDoneTasks(listIndex: index)[indexPath.item].listId
         }
         
         // 추출한 task id로 tasks에서의 index, 속한 list id 정보를 가져와 현재 페이지의 list 이름과 함께 넘긴다.
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }) else { return }
-        taskDetailVC.taskIndex = taskViewModel.lists[listIndex].tasks.firstIndex(where: { $0.id == taskId })
+        guard let listIndex = vm.lists.firstIndex(where: { $0.id == listId }) else { return }
+        taskDetailVC.taskIndex = vm.lists[listIndex].tasks.firstIndex(where: { $0.id == taskId })
         taskDetailVC.listId = listId
         taskDetailVC.previousListName = lblListName.text
         self.navigationController?.pushViewController(taskDetailVC, animated: true)
@@ -267,7 +267,7 @@ extension ToDoListViewController {
             textField.resignFirstResponder()
         } else if lblListName.isFirstResponder {
             // list name edit : done 버튼 탭이 아니라 단순히 다른 영역 tap인 경우 데이터 변동 X
-            lblListName.text = taskViewModel.lists[index].name
+            lblListName.text = vm.lists[index].name
             lblListName.resignFirstResponder()
         }
     }

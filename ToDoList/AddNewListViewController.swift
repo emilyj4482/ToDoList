@@ -11,7 +11,7 @@ class AddNewListViewController: UIViewController {
 
     @IBOutlet weak var textField: UITextField!
     
-    var taskViewModel = TaskViewModel.shared
+    var vm = TaskViewModel.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,11 +31,27 @@ class AddNewListViewController: UIViewController {
         if newListName.isEmpty {
             newListName = "Untitled list"
         }
-        taskViewModel.addList(taskViewModel.createList(newListName))
+        vm.addList(vm.createList(examListName(newListName)))
         
         // 생성된 list의 index를 ToDoListViewController로 넘기면서 이동
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
-        toDoListVC.index = taskViewModel.lists.count - 1
+        toDoListVC.index = vm.lists.count - 1
         self.navigationController?.pushViewController(toDoListVC, animated: false)
+    }
+    
+    // list name 중복검사
+    func examListName(_ text: String) -> String {
+        let list = vm.lists.map { list in
+            list.name
+        }
+        
+        var count = 1
+        var listName = text
+        while list.contains(listName) {
+            listName = "\(text) (\(count))"
+            count += 1
+        }
+        
+        return listName
     }
 }

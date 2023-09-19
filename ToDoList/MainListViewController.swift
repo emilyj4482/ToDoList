@@ -12,14 +12,14 @@ class MainListViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var lblCount: UILabel!
     
-    var taskViewModel = TaskViewModel.shared
+    var vm = TaskViewModel.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         // 로컬에서 저장된 데이터 불러오기
-        taskViewModel.getData()
+        vm.getData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -39,7 +39,7 @@ class MainListViewController: UIViewController {
     
     // list count label 뷰 적용
     func updateLblCount() {
-        let count = taskViewModel.lists.count - 1
+        let count = vm.lists.count - 1
         if count <= 1 {
             lblCount.text = "You have \(count) custom list."
         } else {
@@ -52,7 +52,7 @@ class MainListViewController: UIViewController {
 extension MainListViewController: UITableViewDataSource {
     // row 개수 = 생성한 list 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return taskViewModel.lists.count
+        return vm.lists.count
     }
     
     // cell 지정
@@ -69,7 +69,7 @@ extension MainListViewController: UITableViewDataSource {
         }
         
         // >> text label
-        let list = taskViewModel.lists[indexPath.row]
+        let list = vm.lists[indexPath.row]
         cell.lblListName?.text = list.name
         
         // >> count label : list 당 task 개수 표시. 0개일 때는 표시 X
@@ -92,7 +92,7 @@ extension MainListViewController: UITableViewDataSource {
     
     // cell swipe 시 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let list = taskViewModel.lists[indexPath.row]
+        let list = vm.lists[indexPath.row]
         
         if indexPath.row > 0 && editingStyle == .delete {
             // 삭제 여부를 확실하게 묻는 alert 호출
@@ -100,9 +100,9 @@ extension MainListViewController: UITableViewDataSource {
             let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
                 // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
                 if list.tasks.contains(where: { $0.isImportant }) {
-                    self?.taskViewModel.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
+                    self?.vm.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
                 }
-                self?.taskViewModel.deleteList(listId: list.id)
+                self?.vm.deleteList(listId: list.id)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 tableView.reloadData()
                 // list count label 뷰 적용

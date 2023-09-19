@@ -16,7 +16,7 @@ class TaskDetailViewController: UIViewController {
     @IBOutlet weak var btnBack: UIButton!
     @IBOutlet weak var btnDone: UIButton!
     
-    var taskViewModel = TaskViewModel.shared
+    var vm = TaskViewModel.shared
     var taskIndex: Int?
     var listId: Int?
     var previousListName: String?
@@ -25,8 +25,8 @@ class TaskDetailViewController: UIViewController {
         super.viewDidLoad()
         
         // 이전 VC로부터 정보 전달 받기
-        guard let taskIndex = taskIndex, let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let previousListName = previousListName else { return }
-        let originalList = taskViewModel.lists[listIndex]
+        guard let taskIndex = taskIndex, let listIndex = vm.lists.firstIndex(where: { $0.id == listId }), let previousListName = previousListName else { return }
+        let originalList = vm.lists[listIndex]
         
         // task 정보 view에 적용
         configureUI(listName: originalList.name, task: originalList.tasks[taskIndex])
@@ -67,8 +67,8 @@ class TaskDetailViewController: UIViewController {
         lblTaskTitle.resignFirstResponder()
         
         // 데이터 update (view update는 textfield라 필요 X)
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text?.trim() else { return }
-        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        guard let listIndex = vm.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text?.trim() else { return }
+        var task = vm.lists[listIndex].tasks[taskIndex]
         // textfield 공백 시 수정 적용 X
         if taskTitle.isEmpty {
             lblTaskTitle.text = task.title
@@ -76,17 +76,17 @@ class TaskDetailViewController: UIViewController {
             task.title = taskTitle
             lblTaskTitle.text = taskTitle
         }
-        taskViewModel.updateTaskComplete(task)
+        vm.updateTaskComplete(task)
     }
     
     @IBAction func btnDeleteTapped(_ sender: UIButton) {
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
-        let task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        guard let listIndex = vm.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        let task = vm.lists[listIndex].tasks[taskIndex]
         
         // 삭제 여부를 확실하게 묻는 alert 호출
         let alert = UIAlertController(title: "Delete task", message: "Are you sure you want to delete the task?", preferredStyle: .actionSheet)
         let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
-            self?.taskViewModel.deleteTaskComplete(task)
+            self?.vm.deleteTaskComplete(task)
             self?.navigationController?.popViewController(animated: true)
         })
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
@@ -96,8 +96,8 @@ class TaskDetailViewController: UIViewController {
     }
     
     @IBAction func btnCheckTapped(_ sender: UIButton) {
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
-        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        guard let listIndex = vm.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        var task = vm.lists[listIndex].tasks[taskIndex]
         
         // view update
         btnCheck.isSelected = !btnCheck.isSelected
@@ -105,19 +105,19 @@ class TaskDetailViewController: UIViewController {
         
         // 데이터 update
         task.isDone = btnCheck.isSelected
-        taskViewModel.updateTaskComplete(task)
+        vm.updateTaskComplete(task)
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
-        var task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        guard let listIndex = vm.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        var task = vm.lists[listIndex].tasks[taskIndex]
         
         // view update
         btnImportant.isSelected = !btnImportant.isSelected
         
         // 데이터 update
         task.isImportant = btnImportant.isSelected
-        taskViewModel.updateImportant(task)
+        vm.updateImportant(task)
     }
 }
 
@@ -146,8 +146,8 @@ extension TaskDetailViewController {
     
     // 키보드 숨기기 : done 버튼이 아닌 단순 화면 tap이기 때문에 입력이 발생하더라도 데이터 update되지 않고 task title label이 원래대로 돌아오도록 처리
     @objc private func hideKeyboard() {
-        guard let listIndex = taskViewModel.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
-        let task = taskViewModel.lists[listIndex].tasks[taskIndex]
+        guard let listIndex = vm.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
+        let task = vm.lists[listIndex].tasks[taskIndex]
         
         lblTaskTitle.resignFirstResponder()
         isTaskDone(isDone: task.isDone, string: task.title)
