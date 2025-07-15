@@ -3,7 +3,7 @@
 //  ToDoList
 //
 //  Created by EMILY on 2023/03/30.
-//
+//  Refactored by EMILY on 2025/07/15.
 
 import Foundation
 
@@ -27,17 +27,39 @@ class TaskViewModel {
     }
     
     // UserDefaults 저장 key 값
-    let dataKey: String = "dataKey"
+    private let dataKey: String = "dataKey"
     
-    func createList(_ listName: String) -> List {
+    private func createList(with input: String) -> List {
+        // 공백, 중복 검사 통과한 list name
+        let newListName = examListName(input)
+        
         let nextId = lastListId + 1
         lastListId = nextId
-
-        return List(id: nextId, name: listName, tasks: [])
+        
+        return List(id: nextId, name: newListName, tasks: [])
     }
     
-    func addList(_ list: List) {
-        lists.append(list)
+    // list name 검사 : 1. input 공백 시 "Untitled list" 부여 2. 중복 검사 후 이미 있는 이름일 경우 (n) 붙이고 반환
+    private func examListName(_ input: String) -> String {
+        // 1. 공백 검사
+        let text = input.trim().isEmpty ? "Untitled list" : input.trim()
+        
+        // 2. 중복 검사
+        let listNames = lists.map { $0.name }
+        
+        var count = 1
+        var listName = text
+        while listNames.contains(listName) {
+            listName = "\(text) (\(count))"
+            count += 1
+        }
+        
+        return listName
+    }
+    
+    func addList(with input: String) {
+        let newList = createList(with: input)
+        lists.append(newList)
     }
     
     // Task 내용은 중복 허용(검사 X), 입력값에 대해 앞뒤 공백을 제거해준 뒤 생성한다.

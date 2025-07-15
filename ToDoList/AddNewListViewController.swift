@@ -25,13 +25,10 @@ class AddNewListViewController: UIViewController {
     }
     
     // Done 버튼 : textfield에 입력된 이름으로 list 생성하며 task 목록 화면(ToDoListViewController)으로 이동
-    @IBAction func btnDoneTapped(_ sender: UIButton) {
-        // 새로운 list 생성 (textfield 공백 시 "Untitled list" 부여)
-        guard var newListName = textField.text?.trim() else { return }
-        if newListName.isEmpty {
-            newListName = "Untitled list"
-        }
-        vm.addList(vm.createList(examListName(newListName)))
+    @IBAction func doneButtonTapped(_ sender: UIButton) {
+        // 새로운 list 생성
+        guard let input = textField.text else { return }
+        vm.addList(with: input)
         
         // 생성된 list의 index를 ToDoListViewController로 넘기면서 이동
         guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
