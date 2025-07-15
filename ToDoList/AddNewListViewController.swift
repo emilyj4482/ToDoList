@@ -7,11 +7,15 @@
 
 import UIKit
 
-class AddNewListViewController: UIViewController {
+class AddNewListViewController: UIViewController, TodoManagerInjectable {
 
     @IBOutlet weak var textField: UITextField!
     
-    var vm = TaskViewModel.shared
+    private var todoManager: TodoManager!
+    
+    func inject(todoManager: TodoManager) {
+        self.todoManager = todoManager
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +24,7 @@ class AddNewListViewController: UIViewController {
     }
 
     // Cancel 버튼 : 새로운 list 추가를 취소하고 이전 화면(main)으로 회귀
-    @IBAction func btnCancelTapped(_ sender: UIButton) {
+    @IBAction func cancelButtonTapped(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -28,27 +32,11 @@ class AddNewListViewController: UIViewController {
     @IBAction func doneButtonTapped(_ sender: UIButton) {
         // 새로운 list 생성
         guard let input = textField.text else { return }
-        vm.addList(with: input)
+        todoManager.addList(with: input)
         
         // 생성된 list의 index를 ToDoListViewController로 넘기면서 이동
-        guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
-        toDoListVC.index = vm.lists.count - 1
+        let toDoListVC: ToDoListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
+        toDoListVC.index = todoManager.numberOfCustomLists
         self.navigationController?.pushViewController(toDoListVC, animated: false)
-    }
-    
-    // list name 중복검사
-    func examListName(_ text: String) -> String {
-        let list = vm.lists.map { list in
-            list.name
-        }
-        
-        var count = 1
-        var listName = text
-        while list.contains(listName) {
-            listName = "\(text) (\(count))"
-            count += 1
-        }
-        
-        return listName
     }
 }

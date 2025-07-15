@@ -7,19 +7,23 @@
 
 import UIKit
 
-class MainListViewController: UIViewController {
+class MainListViewController: UIViewController, TodoManagerInjectable {
 
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var lblCount: UILabel!
+    @IBOutlet weak var countLabel: UILabel!
     
-    var vm = TaskViewModel.shared
+    private var todoManager: TodoManager!
+    
+    func inject(todoManager: TodoManager) {
+        self.todoManager = todoManager
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         // 로컬에서 저장된 데이터 불러오기
-        vm.getData()
+        todoManager.getData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -28,22 +32,22 @@ class MainListViewController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         
         self.tableView.reloadData()
-        updateLblCount()
+        updateCountLabel()
     }
     
     // + New List 버튼 tap 시 AddNewListViewController로 이동
-    @IBAction func btnNewListTapped(_ sender: UIButton) {
-        guard let addNewListVC = self.storyboard?.instantiateViewController(identifier: "AddNewListViewController") as? AddNewListViewController else { return }
+    @IBAction func AddNeweListButtonTapped(_ sender: UIButton) {
+        let addNewListVC: AddNewListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
         self.navigationController?.pushViewController(addNewListVC, animated: true)
     }
     
     // list count label 뷰 적용
-    func updateLblCount() {
-        let count = vm.lists.count - 1
+    func updateCountLabel() {
+        let count = todoManager.numberOfCustomLists
         if count <= 1 {
-            lblCount.text = "You have \(count) custom list."
+            countLabel.text = "You have \(count) custom list."
         } else {
-            lblCount.text = "You have \(count) custom lists."
+            countLabel.text = "You have \(count) custom lists."
         }
     }
 }
@@ -52,7 +56,7 @@ class MainListViewController: UIViewController {
 extension MainListViewController: UITableViewDataSource {
     // row 개수 = 생성한 list 개수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return vm.lists.count
+        return todoManager.lists.count
     }
     
     // cell 지정
@@ -69,7 +73,7 @@ extension MainListViewController: UITableViewDataSource {
         }
         
         // >> text label
-        let list = vm.lists[indexPath.row]
+        let list = todoManager.lists[indexPath.row]
         cell.lblListName?.text = list.name
         
         // >> count label : list 당 task 개수 표시. 0개일 때는 표시 X
@@ -92,7 +96,7 @@ extension MainListViewController: UITableViewDataSource {
     
     // cell swipe 시 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let list = vm.lists[indexPath.row]
+        let list = todoManager.lists[indexPath.row]
         
         if indexPath.row > 0 && editingStyle == .delete {
             // 삭제 여부를 확실하게 묻는 alert 호출
@@ -100,13 +104,13 @@ extension MainListViewController: UITableViewDataSource {
             let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
                 // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
                 if list.tasks.contains(where: { $0.isImportant }) {
-                    self?.vm.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
+                    self?.todoManager.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
                 }
-                self?.vm.deleteList(listId: list.id)
+                self?.todoManager.deleteList(listId: list.id)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 tableView.reloadData()
                 // list count label 뷰 적용
-                self?.updateLblCount()
+                self?.updateCountLabel()
             })
             let cancelButton = UIAlertAction(title: "Cancel", style: .cancel)
             alert.addAction(deleteButton)
@@ -125,7 +129,7 @@ extension MainListViewController: UITableViewDelegate {
     
     // row tap 시 동작 : 해당 list의 task 목록 화면(ToDoListViewController)으로 이동
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let toDoListVC = self.storyboard?.instantiateViewController(identifier: "ToDoListViewController") as? ToDoListViewController else { return }
+        let toDoListVC: ToDoListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
         // list의 index 정보를 같이 넘긴다.
         toDoListVC.index = indexPath.row
         self.navigationController?.pushViewController(toDoListVC, animated: true)

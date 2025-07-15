@@ -1,5 +1,5 @@
 //
-//  TaskViewModel.swift
+//  TodoManager.swift
 //  ToDoList
 //
 //  Created by EMILY on 2023/03/30.
@@ -7,11 +7,12 @@
 
 import Foundation
 
-/* ViewModel : Model의 정보를 View에서 사용할 수 있도록 구성한다. */
-class TaskViewModel {
-    
-    // 싱글톤 객체로 선언 : 앱 전반에서 앱 관리를 이 객체 혼자서 하기 때문에 싱글톤으로 선언한다.
-    static let shared = TaskViewModel()
+protocol TodoManagerInjectable {
+    func inject(todoManager: TodoManager)
+}
+
+// List와 Task를 관리하는 객체
+class TodoManager {
     
     // Task.id 저장용 프로퍼티
     private var lastTaskId: Int = 0
@@ -24,6 +25,11 @@ class TaskViewModel {
         didSet {
             saveData()
         }
+    }
+    
+    // Important list를 제외한 리스트의 개수 반환
+    var numberOfCustomLists: Int {
+        return lists.count - 1
     }
     
     // UserDefaults 저장 key 값
