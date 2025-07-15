@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 74;
+	objectVersion = 76;
 	objects = {
 
 /* Begin PBXFileReference section */
@@ -14,20 +14,21 @@
 		A1B22F762E26D66500F69474 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				/Localized/LaunchScreen.storyboard,
-				/Localized/Main.storyboard,
-				AddNewListViewController.swift,
-				AppDelegate.swift,
+				/Localized/Storyboard/LaunchScreen.storyboard,
+				/Localized/Storyboard/Main.storyboard,
 				Assets.xcassets,
-				"Extension+String.swift",
-				"Extension+UIStoryboard.swift",
-				"Extension+UIViewController.swift",
-				MainListViewController.swift,
-				SceneDelegate.swift,
-				Task.swift,
-				TaskDetailViewController.swift,
-				ToDoListViewController.swift,
-				TodoManager.swift,
+				Controller/AddNewListViewController.swift,
+				Controller/MainListViewController.swift,
+				Controller/TaskDetailViewController.swift,
+				Controller/ToDoListViewController.swift,
+				Delegate/AppDelegate.swift,
+				Delegate/SceneDelegate.swift,
+				"Extension/Extension+String.swift",
+				"Extension/Extension+UIStoryboard.swift",
+				"Extension/Extension+UIViewController.swift",
+				Model/List.swift,
+				Model/Task.swift,
+				Model/TodoManager.swift,
 			);
 			target = A18CAC4D29D13F46008001EA /* ToDoList */;
 		};
