@@ -155,10 +155,3 @@ class TaskViewModel {
         self.lists = savedData
     }
 }
-
-// 문자열 앞뒤 공백 삭제 메소드 정의
-extension String {
-    func trim() -> String {
-        return self.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-}
