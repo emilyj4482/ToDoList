@@ -133,7 +133,7 @@ extension ToDoListViewController: UICollectionViewDataSource {
     
     // cell 지정 : task done 여부에 따라 section 분리
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ToDoCell", for: indexPath) as? ToDoCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ToDoCell.identifier, for: indexPath) as? ToDoCell else { return UICollectionViewCell() }
         
         guard let index = index else { return UICollectionViewCell() }
         var task: Task
@@ -170,7 +170,7 @@ extension ToDoListViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "TaskDoneHeader", for: indexPath) as? TaskDoneHeader else { return UICollectionReusableView() }
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TaskDoneHeader.identifier, for: indexPath) as? TaskDoneHeader else { return UICollectionReusableView() }
             return header
         default:
             return UICollectionReusableView()
@@ -279,6 +279,8 @@ extension ToDoListViewController {
 }
 
 class ToDoCell: UICollectionViewCell {
+    static let identifier = String(describing: ToDoCell.self)
+    
     @IBOutlet weak var btnCheck: UIButton!
     @IBOutlet weak var lblTask: UILabel!
     @IBOutlet weak var btnImportant: UIButton!
@@ -317,4 +319,6 @@ class ToDoCell: UICollectionViewCell {
     }
 }
 
-class TaskDoneHeader: UICollectionReusableView {}
+class TaskDoneHeader: UICollectionReusableView {
+    static let identifier = String(describing: TaskDoneHeader.self)
+}

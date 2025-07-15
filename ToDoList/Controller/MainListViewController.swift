@@ -61,7 +61,7 @@ extension MainListViewController: UITableViewDataSource {
     
     // cell 지정
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ListNameCell", for: indexPath) as? ListNameCell else { return UITableViewCell() }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ListNameCell.identifier, for: indexPath) as? ListNameCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
         // cell 뷰 적용
@@ -137,6 +137,8 @@ extension MainListViewController: UITableViewDelegate {
 }
 
 class ListNameCell: UITableViewCell {
+    static let identifier = String(describing: ListNameCell.self)
+    
     @IBOutlet weak var listIcon: UIImageView!
     @IBOutlet weak var lblListName: UILabel!
     @IBOutlet weak var lblTaskCount: UILabel!
