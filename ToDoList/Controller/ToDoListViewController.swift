@@ -10,12 +10,12 @@ import UIKit
 class ToDoListViewController: UIViewController, TodoManagerInjectable {
 
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var tfView: UIView!
-    @IBOutlet weak var btnAddTask: UIButton!
+    @IBOutlet weak var textFieldContainer: UIView!
+    @IBOutlet weak var addTaskButton: UIButton!
     @IBOutlet weak var textField: UITextField!
-    @IBOutlet weak var btnDone: UIButton!
-    @IBOutlet weak var tfViewBottom: NSLayoutConstraint!
-    @IBOutlet weak var lblListName: UITextField!
+    @IBOutlet weak var doneButton: UIButton!
+    @IBOutlet weak var textFieldBottonConstraint: NSLayoutConstraint!
+    @IBOutlet weak var listNameTextField: UITextField!
     
     private var todoManager: TodoManager!
     
@@ -41,13 +41,13 @@ class ToDoListViewController: UIViewController, TodoManagerInjectable {
 
         guard let index = index else { return }
         // list 이름 라벨에 적용
-        self.lblListName.text = todoManager.lists[index].name
+        self.listNameTextField.text = todoManager.lists[index].name
         // Important list의 경우 star icon을 통해서만 task를 추가할 수 있도록 구현 >> Add a Task 기능 비활성화
         // Important list가 아닐 경우 label(textfield) 탭 시 edit 가능
         if index == 0 {
-            btnAddTask.isHidden = true
+            addTaskButton.isHidden = true
         } else {
-            lblListName.isEnabled = true
+            listNameTextField.isEnabled = true
         }
     }
     
@@ -72,14 +72,14 @@ class ToDoListViewController: UIViewController, TodoManagerInjectable {
     }
     
     // Lists 버튼 : MainViewController로 돌아간다.
-    @IBAction func btnListsTapped(_ sender: UIButton) {
+    @IBAction func backButtonTapped(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
     
     // Done 버튼 : list name을 tap하거나, + Add a Task 버튼을 tap했을 때 노출된다. 상황에 따라 동작이 분리된다.
-    @IBAction func btnDoneTapped(_ sender: UIButton) {
+    @IBAction func doneButtonTapped(_ sender: UIButton) {
         guard let title = textField.text?.trim() else { return }
-        guard let name = lblListName.text?.trim() else { return }
+        guard let name = listNameTextField.text?.trim() else { return }
         
         guard let index = index else { return }
         let list = todoManager.lists[index]
@@ -88,7 +88,7 @@ class ToDoListViewController: UIViewController, TodoManagerInjectable {
         // task 추가 : 입력된 값으로 task create & add
         if textField.isFirstResponder && !title.isEmpty {
             todoManager.addTask(listId: list.id, todoManager.createTask(listId: list.id, title))
-        } else if lblListName.isFirstResponder {
+        } else if listNameTextField.isFirstResponder {
             // 공백 입력 시 수정 적용 X
             if name.isEmpty {
                 todoManager.updateList(listId: list.id, list.name)
@@ -102,8 +102,8 @@ class ToDoListViewController: UIViewController, TodoManagerInjectable {
     }
     
     // + Add a Task 버튼을 누르면 텍스트필드와 Done 버튼의 숨김이 해제되고 할 일을 입력할 수 있도록 키보드가 나타난다.
-    @IBAction func btnAddTapped(_ sender: UIButton) {
-        tfView.isHidden = false
+    @IBAction func addButtonTapped(_ sender: UIButton) {
+        textFieldContainer.isHidden = false
         textField.becomeFirstResponder()
     }
 }
@@ -145,10 +145,10 @@ extension ToDoListViewController: UICollectionViewDataSource {
         }
         
         // cell 뷰 적용
-        cell.btnCheck.isSelected = task.isDone
+        cell.checkButton.isSelected = task.isDone
         cell.checkbutton(isDone: task.isDone)
-        cell.lblTask.text = task.title
-        cell.btnImportant.isSelected = task.isImportant
+        cell.taskLabel.text = task.title
+        cell.startButton.isSelected = task.isImportant
         
         // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
 
@@ -182,7 +182,7 @@ extension ToDoListViewController: UICollectionViewDataSource {
 extension ToDoListViewController: UICollectionViewDelegate {
     // item tap 시 동작 : 해당 task의 상세화면(TaskDetailViewController)으로 이동
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let taskDetailVC: TaskDetailViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
+        let taskDetailViewController: TaskDetailViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
         guard let index = index else { return }
         
         // section에 따라 task의 id 및 list id 추출
@@ -198,10 +198,10 @@ extension ToDoListViewController: UICollectionViewDelegate {
         
         // 추출한 task id로 tasks에서의 index, 속한 list id 정보를 가져와 현재 페이지의 list 이름과 함께 넘긴다.
         guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }) else { return }
-        taskDetailVC.taskIndex = todoManager.lists[listIndex].tasks.firstIndex(where: { $0.id == taskId })
-        taskDetailVC.listId = listId
-        taskDetailVC.previousListName = lblListName.text
-        self.navigationController?.pushViewController(taskDetailVC, animated: true)
+        taskDetailViewController.taskIndex = todoManager.lists[listIndex].tasks.firstIndex(where: { $0.id == taskId })
+        taskDetailViewController.listId = listId
+        taskDetailViewController.previousListName = listNameTextField.text
+        self.navigationController?.pushViewController(taskDetailViewController, animated: true)
     }
 }
 
@@ -242,10 +242,10 @@ extension ToDoListViewController {
         // 적용할 높이 = keyboard 높이 - safe area 높이
         let adjustmentHeight = keyboardHeight - view.safeAreaInsets.bottom
         // 적용할 높이만큼 textfield 영역 높임
-        tfViewBottom.constant = adjustmentHeight
+        textFieldBottonConstraint.constant = adjustmentHeight
         
         // Done button 노출
-        btnDone.isHidden = false
+        doneButton.isHidden = false
         
         // 키보드가 올라온 상태에서는 view touch cancel (이렇게 하지 않으면 Done 버튼을 눌러도 그냥 view touch로 인식되어 버튼 기능이 작동하지 않는다)
         tapGestureRecognizer.cancelsTouchesInView = true
@@ -253,10 +253,10 @@ extension ToDoListViewController {
     
     // textfield 영역 높이 원점
     @objc private func keyboardWillHide() {
-        tfViewBottom.constant = 0
+        textFieldBottonConstraint.constant = 0
         
         // Done Button 숨김
-        btnDone.isHidden = true
+        doneButton.isHidden = true
         
         // 키보드가 내려가면서 view touch 활성화 (tableview cell에 대한 touch 인식하도록 처리)
         tapGestureRecognizer.cancelsTouchesInView = false
@@ -268,12 +268,12 @@ extension ToDoListViewController {
         // add a task : textfield를 비우고 영역 숨김
         if textField.isFirstResponder {
             textField.text = ""
-            tfView.isHidden = true
+            textFieldContainer.isHidden = true
             textField.resignFirstResponder()
-        } else if lblListName.isFirstResponder {
+        } else if listNameTextField.isFirstResponder {
             // list name edit : done 버튼 탭이 아니라 단순히 다른 영역 tap인 경우 데이터 변동 X
-            lblListName.text = todoManager.lists[index].name
-            lblListName.resignFirstResponder()
+            listNameTextField.text = todoManager.lists[index].name
+            listNameTextField.resignFirstResponder()
         }
     }
 }
@@ -281,40 +281,40 @@ extension ToDoListViewController {
 class ToDoCell: UICollectionViewCell {
     static let identifier = String(describing: ToDoCell.self)
     
-    @IBOutlet weak var btnCheck: UIButton!
-    @IBOutlet weak var lblTask: UILabel!
-    @IBOutlet weak var btnImportant: UIButton!
+    @IBOutlet weak var checkButton: UIButton!
+    @IBOutlet weak var taskLabel: UILabel!
+    @IBOutlet weak var startButton: UIButton!
     
     var checkButtonTapHandler: ((Bool) -> Void)?
     var importantButtonTapHandler: ((Bool) -> Void)?
     
     @IBAction func btnCheckTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
-        btnCheck.isSelected = !btnCheck.isSelected
+        checkButton.isSelected = !checkButton.isSelected
         
         // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
-        checkbutton(isDone: btnCheck.isSelected)
+        checkbutton(isDone: checkButton.isSelected)
         
         // 데이터 변동 : checkButtonTapHandler에 isDone 여부 전송
-        checkButtonTapHandler?(btnCheck.isSelected)
+        checkButtonTapHandler?(checkButton.isSelected)
     }
     
     @IBAction func btnImportantTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
-        btnImportant.isSelected = !btnImportant.isSelected
+        startButton.isSelected = !startButton.isSelected
         
         // 데이터 변동 : importantButtonTapHandler에 isImportant 여부 전송
-        importantButtonTapHandler?(btnImportant.isSelected)
+        importantButtonTapHandler?(startButton.isSelected)
     }
     
     // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
     func checkbutton(isDone: Bool) {
         if isDone {
-            lblTask.attributedText = NSAttributedString(string: lblTask.text!, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
-            lblTask.alpha = 0.5
+            taskLabel.attributedText = NSAttributedString(string: taskLabel.text!, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            taskLabel.alpha = 0.5
         } else {
-            lblTask.attributedText = NSAttributedString(string: lblTask.text!, attributes: [.strikethroughStyle: NSUnderlineStyle()])
-            lblTask.alpha = 1
+            taskLabel.attributedText = NSAttributedString(string: taskLabel.text!, attributes: [.strikethroughStyle: NSUnderlineStyle()])
+            taskLabel.alpha = 1
         }
     }
 }

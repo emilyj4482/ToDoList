@@ -37,8 +37,8 @@ class MainListViewController: UIViewController, TodoManagerInjectable {
     
     // + New List 버튼 tap 시 AddNewListViewController로 이동
     @IBAction func AddNeweListButtonTapped(_ sender: UIButton) {
-        let addNewListVC: AddNewListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
-        self.navigationController?.pushViewController(addNewListVC, animated: true)
+        let addNewListViewController: AddNewListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
+        self.navigationController?.pushViewController(addNewListViewController, animated: true)
     }
     
     // list count label 뷰 적용
@@ -74,13 +74,13 @@ extension MainListViewController: UITableViewDataSource {
         
         // >> text label
         let list = todoManager.lists[indexPath.row]
-        cell.lblListName?.text = list.name
+        cell.listNameLabel?.text = list.name
         
         // >> count label : list 당 task 개수 표시. 0개일 때는 표시 X
         if list.tasks.count == 0 {
-            cell.lblTaskCount.text = ""
+            cell.taskCountLabel.text = ""
         } else {
-            cell.lblTaskCount.text = String(list.tasks.count)
+            cell.taskCountLabel.text = String(list.tasks.count)
         }
         return cell
     }
@@ -129,10 +129,10 @@ extension MainListViewController: UITableViewDelegate {
     
     // row tap 시 동작 : 해당 list의 task 목록 화면(ToDoListViewController)으로 이동
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let toDoListVC: ToDoListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
+        let toDoListViewController: ToDoListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
         // list의 index 정보를 같이 넘긴다.
-        toDoListVC.index = indexPath.row
-        self.navigationController?.pushViewController(toDoListVC, animated: true)
+        toDoListViewController.index = indexPath.row
+        self.navigationController?.pushViewController(toDoListViewController, animated: true)
     }
 }
 
@@ -140,6 +140,6 @@ class ListNameCell: UITableViewCell {
     static let identifier = String(describing: ListNameCell.self)
     
     @IBOutlet weak var listIcon: UIImageView!
-    @IBOutlet weak var lblListName: UILabel!
-    @IBOutlet weak var lblTaskCount: UILabel!
+    @IBOutlet weak var listNameLabel: UILabel!
+    @IBOutlet weak var taskCountLabel: UILabel!
 }

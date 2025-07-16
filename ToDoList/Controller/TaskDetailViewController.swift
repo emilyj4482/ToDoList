@@ -9,12 +9,12 @@ import UIKit
 
 class TaskDetailViewController: UIViewController, TodoManagerInjectable {
     
-    @IBOutlet weak var btnCheck: UIButton!
-    @IBOutlet weak var btnImportant: UIButton!
-    @IBOutlet weak var lblTaskTitle: UITextField!
-    @IBOutlet weak var lblListName: UILabel!
-    @IBOutlet weak var btnBack: UIButton!
-    @IBOutlet weak var btnDone: UIButton!
+    @IBOutlet weak var checkButton: UIButton!
+    @IBOutlet weak var starButton: UIButton!
+    @IBOutlet weak var taskTitleTextField: UITextField!
+    @IBOutlet weak var listNameLabel: UILabel!
+    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var doneButton: UIButton!
     
     private var todoManager: TodoManager!
     
@@ -37,7 +37,7 @@ class TaskDetailViewController: UIViewController, TodoManagerInjectable {
         configureUI(listName: originalList.name, task: originalList.tasks[taskIndex])
 
         // Back 버튼 text에 이전 페이지 list 이름 적용
-        btnBack.setTitle(" \(previousListName)", for: .normal)
+        backButton.setTitle(" \(previousListName)", for: .normal)
         
         // 키보드 detection
         detectKeyboard()
@@ -46,45 +46,45 @@ class TaskDetailViewController: UIViewController, TodoManagerInjectable {
     }
     
     func configureUI(listName: String, task: Task) {
-        btnCheck.isSelected = task.isDone
-        btnImportant.isSelected = task.isImportant
-        lblListName.text = listName
+        checkButton.isSelected = task.isDone
+        starButton.isSelected = task.isImportant
+        listNameLabel.text = listName
         isTaskDone(isDone: task.isDone, string: task.title)
     }
     
     // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
     func isTaskDone(isDone: Bool, string: String) {
         if isDone {
-            lblTaskTitle.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
-            lblTaskTitle.alpha = 0.5
+            taskTitleTextField.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            taskTitleTextField.alpha = 0.5
         } else {
-            lblTaskTitle.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle()])
-            lblTaskTitle.alpha = 1
+            taskTitleTextField.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle()])
+            taskTitleTextField.alpha = 1
         }
     }
     
-    @IBAction func btnBackTapped(_ sender: UIButton) {
+    @IBAction func backButtonTapped(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func btnDoneTapped(_ sender: UIButton) {
+    @IBAction func doneButtonTapped(_ sender: UIButton) {
         // 키보드 숨김 처리
-        lblTaskTitle.resignFirstResponder()
+        taskTitleTextField.resignFirstResponder()
         
         // 데이터 update (view update는 textfield라 필요 X)
-        guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = lblTaskTitle.text?.trim() else { return }
+        guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex, let taskTitle = taskTitleTextField.text?.trim() else { return }
         var task = todoManager.lists[listIndex].tasks[taskIndex]
         // textfield 공백 시 수정 적용 X
         if taskTitle.isEmpty {
-            lblTaskTitle.text = task.title
+            taskTitleTextField.text = task.title
         } else {
             task.title = taskTitle
-            lblTaskTitle.text = taskTitle
+            taskTitleTextField.text = taskTitle
         }
         todoManager.updateTaskComplete(task)
     }
     
-    @IBAction func btnDeleteTapped(_ sender: UIButton) {
+    @IBAction func deleteButtonTapped(_ sender: UIButton) {
         guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
         let task = todoManager.lists[listIndex].tasks[taskIndex]
         
@@ -100,28 +100,28 @@ class TaskDetailViewController: UIViewController, TodoManagerInjectable {
         self.present(alert, animated: true)
     }
     
-    @IBAction func btnCheckTapped(_ sender: UIButton) {
+    @IBAction func checkButtonTapped(_ sender: UIButton) {
         guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
         var task = todoManager.lists[listIndex].tasks[taskIndex]
         
         // view update
-        btnCheck.isSelected = !btnCheck.isSelected
-        isTaskDone(isDone: btnCheck.isSelected, string: task.title)
+        checkButton.isSelected = !checkButton.isSelected
+        isTaskDone(isDone: checkButton.isSelected, string: task.title)
         
         // 데이터 update
-        task.isDone = btnCheck.isSelected
+        task.isDone = checkButton.isSelected
         todoManager.updateTaskComplete(task)
     }
     
-    @IBAction func btnImportantTapped(_ sender: UIButton) {
+    @IBAction func starButtonTapped(_ sender: UIButton) {
         guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
         var task = todoManager.lists[listIndex].tasks[taskIndex]
         
         // view update
-        btnImportant.isSelected = !btnImportant.isSelected
+        starButton.isSelected = !starButton.isSelected
         
         // 데이터 update
-        task.isImportant = btnImportant.isSelected
+        task.isImportant = starButton.isSelected
         todoManager.updateImportant(task)
     }
 }
@@ -138,15 +138,15 @@ extension TaskDetailViewController {
     }
     
     @objc private func keyboardWillShow(notification: Notification) {
-        btnDone.isHidden = false
-        btnCheck.isEnabled = false
-        btnImportant.isEnabled = false
+        doneButton.isHidden = false
+        checkButton.isEnabled = false
+        starButton.isEnabled = false
     }
     
     @objc private func keyboardWillHide(notification: Notification) {
-        btnDone.isHidden = true
-        btnCheck.isEnabled = true
-        btnImportant.isEnabled = true
+        doneButton.isHidden = true
+        checkButton.isEnabled = true
+        starButton.isEnabled = true
     }
     
     // 키보드 숨기기 : done 버튼이 아닌 단순 화면 tap이기 때문에 입력이 발생하더라도 데이터 update되지 않고 task title label이 원래대로 돌아오도록 처리
@@ -154,7 +154,7 @@ extension TaskDetailViewController {
         guard let listIndex = todoManager.lists.firstIndex(where: { $0.id == listId }), let taskIndex = taskIndex else { return }
         let task = todoManager.lists[listIndex].tasks[taskIndex]
         
-        lblTaskTitle.resignFirstResponder()
+        taskTitleTextField.resignFirstResponder()
         isTaskDone(isDone: task.isDone, string: task.title)
     }
 }

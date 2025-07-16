@@ -79,9 +79,9 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="lblListName" destination="Qls-bV-u9e" id="KG2-b1-dNU"/>
-                                            <outlet property="lblTaskCount" destination="0TF-xG-LV7" id="rZD-Po-gea"/>
                                             <outlet property="listIcon" destination="far-LB-Adg" id="XpV-OA-i6w"/>
+                                            <outlet property="listNameLabel" destination="Qls-bV-u9e" id="KG2-b1-dNU"/>
+                                            <outlet property="taskCountLabel" destination="0TF-xG-LV7" id="rZD-Po-gea"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -157,7 +157,7 @@
                                     <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
-                                    <action selector="btnBackTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="gsM-vk-mfn"/>
+                                    <action selector="backButtonTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="gsM-vk-mfn"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ibe-eT-Tbq">
@@ -169,7 +169,7 @@
                                     <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
-                                    <action selector="btnDoneTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="VG7-w2-ZC9"/>
+                                    <action selector="doneButtonTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="VG7-w2-ZC9"/>
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nfg-Id-CS3">
@@ -189,7 +189,7 @@
                                         </state>
                                         <state key="selected" image="checkmark.circle.fill" catalog="system"/>
                                         <connections>
-                                            <action selector="btnCheckTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="esP-8M-WZe"/>
+                                            <action selector="checkButtonTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="esP-8M-WZe"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q0Y-to-1pM">
@@ -202,7 +202,7 @@
                                         <state key="normal" image="star" catalog="system"/>
                                         <state key="selected" image="star.fill" catalog="system"/>
                                         <connections>
-                                            <action selector="btnImportantTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="H69-9e-fhJ"/>
+                                            <action selector="starButtonTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="H69-9e-fhJ"/>
                                         </connections>
                                     </button>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="to study" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="0y1-jF-o5J">
@@ -257,7 +257,7 @@
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" image="trash" catalog="system"/>
                                 <connections>
-                                    <action selector="btnDeleteTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="d36-bX-4EV"/>
+                                    <action selector="deleteButtonTapped:" destination="eqT-NH-GD7" eventType="touchUpInside" id="d36-bX-4EV"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -280,12 +280,12 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="btnBack" destination="hu2-WF-kru" id="5al-jp-EP5"/>
-                        <outlet property="btnCheck" destination="foY-Xf-vxv" id="YUW-V8-4Uv"/>
-                        <outlet property="btnDone" destination="Ibe-eT-Tbq" id="nsc-xU-BI9"/>
-                        <outlet property="btnImportant" destination="q0Y-to-1pM" id="vKC-OZ-yd5"/>
-                        <outlet property="lblListName" destination="5gQ-or-fC9" id="lJ5-c1-tnT"/>
-                        <outlet property="lblTaskTitle" destination="0y1-jF-o5J" id="Zi1-Bw-iy4"/>
+                        <outlet property="backButton" destination="hu2-WF-kru" id="5al-jp-EP5"/>
+                        <outlet property="checkButton" destination="foY-Xf-vxv" id="YUW-V8-4Uv"/>
+                        <outlet property="doneButton" destination="Ibe-eT-Tbq" id="nsc-xU-BI9"/>
+                        <outlet property="listNameLabel" destination="5gQ-or-fC9" id="lJ5-c1-tnT"/>
+                        <outlet property="starButton" destination="q0Y-to-1pM" id="vKC-OZ-yd5"/>
+                        <outlet property="taskTitleTextField" destination="0y1-jF-o5J" id="Zi1-Bw-iy4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CBO-DN-GIA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -374,7 +374,7 @@
                                     <color key="titleColor" systemColor="tintColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="btnListsTapped:" destination="tlr-d3-ww4" eventType="touchUpInside" id="uX2-Xt-brz"/>
+                                    <action selector="backButtonTapped:" destination="tlr-d3-ww4" eventType="touchUpInside" id="uX2-Xt-brz"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FNy-K4-4ue">
@@ -386,7 +386,7 @@
                                     <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
-                                    <action selector="btnAddTapped:" destination="tlr-d3-ww4" eventType="touchUpInside" id="SKV-CM-NxT"/>
+                                    <action selector="addButtonTapped:" destination="tlr-d3-ww4" eventType="touchUpInside" id="SKV-CM-NxT"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CCK-7V-TKs">
@@ -398,7 +398,7 @@
                                     <color key="titleColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 </state>
                                 <connections>
-                                    <action selector="btnDoneTapped:" destination="tlr-d3-ww4" eventType="touchUpInside" id="EY7-gZ-NDr"/>
+                                    <action selector="doneButtonTapped:" destination="tlr-d3-ww4" eventType="touchUpInside" id="EY7-gZ-NDr"/>
                                 </connections>
                             </button>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Important" minimumFontSize="30" translatesAutoresizingMaskIntoConstraints="NO" id="2jG-DB-sXV">
@@ -472,9 +472,9 @@
                                         <gestureRecognizers/>
                                         <size key="customSize" width="335" height="50"/>
                                         <connections>
-                                            <outlet property="btnCheck" destination="vRC-Tf-bhs" id="Q91-nJ-OrS"/>
-                                            <outlet property="btnImportant" destination="xEH-J9-xcn" id="2Qv-vp-APk"/>
-                                            <outlet property="lblTask" destination="TZ1-oL-lhC" id="xRd-46-HIc"/>
+                                            <outlet property="checkButton" destination="vRC-Tf-bhs" id="Q91-nJ-OrS"/>
+                                            <outlet property="startButton" destination="xEH-J9-xcn" id="2Qv-vp-APk"/>
+                                            <outlet property="taskLabel" destination="TZ1-oL-lhC" id="xRd-46-HIc"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -499,7 +499,7 @@
                                 <rect key="frame" x="0.0" y="694" width="375" height="50"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="AwL-dr-8KF">
-                                        <rect key="frame" x="30" y="15.666666666666666" width="20" height="18.666666666666671"/>
+                                        <rect key="frame" x="30" y="15.666666666666664" width="20" height="18.666666666666679"/>
                                         <color key="tintColor" red="0.96568971869999998" green="0.0077413050460000002" blue="0.43264403940000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="20" id="5Ht-ET-6xq"/>
@@ -547,13 +547,13 @@
                     </view>
                     <navigationItem key="navigationItem" id="9Ar-0A-mfs"/>
                     <connections>
-                        <outlet property="btnAddTask" destination="FNy-K4-4ue" id="JP6-7H-V5c"/>
-                        <outlet property="btnDone" destination="CCK-7V-TKs" id="cAb-CV-y7a"/>
+                        <outlet property="addTaskButton" destination="FNy-K4-4ue" id="JP6-7H-V5c"/>
                         <outlet property="collectionView" destination="Xr3-BI-lvx" id="Gr6-Wr-Nnn"/>
-                        <outlet property="lblListName" destination="2jG-DB-sXV" id="lVG-8q-57h"/>
+                        <outlet property="doneButton" destination="CCK-7V-TKs" id="cAb-CV-y7a"/>
+                        <outlet property="listNameTextField" destination="2jG-DB-sXV" id="lVG-8q-57h"/>
                         <outlet property="textField" destination="186-i6-5Vs" id="Itp-mb-qu3"/>
-                        <outlet property="tfView" destination="LSt-PC-rFI" id="mPO-9p-5v5"/>
-                        <outlet property="tfViewBottom" destination="1f5-ko-ETV" id="Kfz-8S-b5U"/>
+                        <outlet property="textFieldBottonConstraint" destination="1f5-ko-ETV" id="Kfz-8S-b5U"/>
+                        <outlet property="textFieldContainer" destination="LSt-PC-rFI" id="mPO-9p-5v5"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="m91-pZ-shU" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

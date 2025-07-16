@@ -35,8 +35,8 @@ class AddNewListViewController: UIViewController, TodoManagerInjectable {
         todoManager.addList(with: input)
         
         // 생성된 list의 index를 ToDoListViewController로 넘기면서 이동
-        let toDoListVC: ToDoListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
-        toDoListVC.index = todoManager.numberOfCustomLists
-        self.navigationController?.pushViewController(toDoListVC, animated: false)
+        let toDoListViewController: ToDoListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
+        toDoListViewController.index = todoManager.numberOfCustomLists
+        self.navigationController?.pushViewController(toDoListViewController, animated: false)
     }
 }

@@ -9,11 +9,11 @@ import UIKit
 
 extension UIStoryboard {
     func instantiateViewController<T: UIViewController & TodoManagerInjectable> (todoManager: TodoManager) -> T {
-        guard let vc = instantiateViewController(withIdentifier: T.identifier) as? T else {
+        guard let viewController = instantiateViewController(withIdentifier: T.identifier) as? T else {
             fatalError("Could not instantiate \(T.self) with identifier '\(T.identifier)'")
         }
-        vc.inject(todoManager: todoManager)
-        return vc
+        viewController.inject(todoManager: todoManager)
+        return viewController
     }
 }
 
