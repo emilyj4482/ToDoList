@@ -34,6 +34,79 @@
 ├── Assets.xcassets
 └── Info.plist
 ```
+
+## 스토리보드 기반 프로젝트에서 객체 의존성 주입
+```swift
+class MainViewController: UIViewController {
+	private var todoManager: TodoManager
+    
+    init(todoManager: TodoManager) {
+    	self.todoManager = TodoManager
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // ... //
+}
+```
+코드베이스 프로젝트에서 위 코드는 평범하고 성공적인 코드지만 스토리보드 프로젝트에서는 그렇지 않습니다. `required init?`이 최우선적으로 호출되고 `init`은 호출되지 않기 때문에 `manager` 객체를 이니셜라이징 하는 데 실패합니다.
+> [자세한 이유와 고민 과정을 담은 포스트](https://velog.io/@emilyj4482/iOS-storyboard-%EA%B8%B0%EB%B0%98-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%97%90%EC%84%9C%EC%9D%98-%EC%9D%98%EC%A1%B4%EC%84%B1-%EC%A3%BC%EC%9E%85)
+
+여러가지 방법이 있지만 저는 그중에서도 모든 컨트롤러에 `TodoManagerInjectable` protocol을 채택시켜 `inject` 메소드를 필수 구현하도록 하고, `UIStoryboard`의 `extension`을 활용하여 팩토리 메소드가 호출되도록 하였습니다.
+```swift
+protocol TodoManagerInjectable {
+    func inject(todoManager: TodoManager)
+}
+
+class MainViewController: UIViewController, TodoManagerInjectable {
+	private var todoManager: TodoManager!
+    
+    func inject(todoManager: TodoManager) {
+        self.todoManager = todoManager
+    }
+}
+```
+```swift
+extension UIStoryboard {
+	func instantiateViewController<T: UIViewController & TodoManagerInjectable>(with todoManager: TodoManager) -> T {
+    	// 1. identifier를 통해 view controller 생성
+    	guard let viewController = instantiateViewController(withIdentifier: T.identifier) as? T else {
+            fatalError("Could not instantiate \(T.self) with identifier '\(T.identifier)'")
+        }
+        // 2. 의존성 주입
+        viewController.inject(todoManager: todoManager)
+        // 3. 반환
+        return viewController
+    }
+}
+```
+```swift
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        // manager 생성
+        let todoManager: TodoManager = .init()
+        
+        // ViewController 타입을 명시하며 instantiate
+        let rootViewController: MainViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
+        
+        let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = UINavigationController(rootViewController: rootViewController)
+        window.makeKeyAndVisible()
+        self.window = window
+    }
+    
+    // ... //
+}
+```
+
 ## 화면 별 구현
 ### 01) 메인 화면
 | MainListView | |
@@ -103,7 +176,26 @@ class AddNewListViewController: UIViewController {
     // ... //
 }
 ```
-
+#### 이름 중복 검사 로직 : 같은 이름이 있을 경우 `Untitled list (1)`, `Untitled list (2)`...가 추가되도록 구현
+```swift
+// list name 검사 : 1. input 공백 시 "Untitled list" 부여 2. 중복 검사 후 이미 있는 이름일 경우 (n) 붙이고 반환
+private func examListName(_ input: String) -> String {
+    // 1. 공백 검사
+    let text = input.trim().isEmpty ? "Untitled list" : input.trim()
+        
+    // 2. 중복 검사
+    let listNames = lists.map { $0.name }
+        
+    var count = 1
+    var listName = text
+    while listNames.contains(listName) {
+        listName = "\(text) (\(count))"
+        count += 1
+    }
+       
+    return listName
+}
+```
 | | |
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/40de2276-83f4-4595-adb3-c902f80f6c5e"> | `Cancel` 버튼을 누르면 다시 메인 화면으로, `Done` 버튼을 누르면 추가된 리스트의 `Todo` 화면으로 이동합니다. |
@@ -266,3 +358,44 @@ class ToDoListViewController: UIViewController {
     }
 }
 ```
+
+| | |
+| ----- | ----- |
+| <img src="https://github.com/user-attachments/assets/e914914d-3c12-456a-876d-dc43eccc1c09"> | List 타이틀 부분을 탭하면, 타이틀 수정모드가 됩니다. |
+#### 타이틀 컴포넌트를 UItextField로 구현
+> 이에 따라 `Done` 버튼을 탭했을 때 타이틀 수정 모드인지 할 일 추가 모드인지 분기 처리 필요
+```swift
+@IBAction func doneButtonTapped(_ sender: UIButton) {
+    if taskTextField.isFirstResponder && !title.isEmpty {
+            todoManager.addTask(...)
+    } else if listNameTextField.isFirstResponder {
+        todoManager.updateList(...)
+    }
+
+    hideKeyboard()
+    collectionView.reloadData()
+}
+```
+
+| | |
+| ----- | ----- |
+| <img src ="https://github.com/user-attachments/assets/5cf4b919-931a-49db-93a4-76e72abae804"> | - 할 일 완료/취소 처리, 중요한 일로 북마크/취소 처리를 할 수 있습니다.<br>- 북마크하면 `Important` 리스트에 추가되고, 업데이트 동작은 싱크됩니다. |
+```swift
+class TodoManager {
+    // ... //
+
+    func updateTaskComplete(_ task: Task) {
+        // important task라면 Important list에서와 원래 속한 list 모두에서 업데이트 적용
+        if task.isImportant {
+            updateSingleTask(listId: 1, taskId: task.id, task: task)
+        }
+        updateSingleTask(listId: task.listId, taskId: task.id, task: task)
+    }
+}
+```
+
+### 04) 디테일 화면
+| | |
+| ----- | ----- |
+| <img src="https://github.com/user-attachments/assets/0c978981-137d-4fa0-a453-0a9a9b6284d4"> | - `TodoListView`에서 `Task` 셀을 탭하면 디테일 화면으로 이동합니다.<br>- 할 일 완료 및 북마크/취소 처리와 타이틀 수정, 할 일 삭제를 할 수 있습니다. |
+
