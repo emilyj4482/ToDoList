@@ -28,15 +28,13 @@ class MainListViewController: UIViewController, TodoManagerInjectable {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // Navigation Bar 숨김
         navigationController?.navigationBar.isHidden = true
-        
-        self.tableView.reloadData()
+        tableView.reloadData()
         updateCountLabel()
     }
     
     // + New List 버튼 tap 시 AddNewListViewController로 이동
-    @IBAction func AddNeweListButtonTapped(_ sender: UIButton) {
+    @IBAction func addButtonTapped(_ sender: UIButton) {
         let addNewListViewController: AddNewListViewController = Storyboard.main.instantiateViewController(todoManager: todoManager)
         self.navigationController?.pushViewController(addNewListViewController, animated: true)
     }
@@ -64,24 +62,10 @@ extension MainListViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ListNameCell.identifier, for: indexPath) as? ListNameCell else { return UITableViewCell() }
         // cell tap 시 배경색 회색되지 않게
         cell.selectionStyle = .none
-        // cell 뷰 적용
-        // >> icon : Important만 star image, 나머지 list는 checklist image
-        if indexPath.row == 0 {
-            cell.listIcon.image = UIImage(systemName: "star.fill")
-        } else {
-            cell.listIcon.image = UIImage(systemName: "checklist.checked")
-        }
-        
-        // >> text label
+
         let list = todoManager.lists[indexPath.row]
-        cell.listNameLabel?.text = list.name
+        cell.configure(with: list)
         
-        // >> count label : list 당 task 개수 표시. 0개일 때는 표시 X
-        if list.tasks.count == 0 {
-            cell.taskCountLabel.text = ""
-        } else {
-            cell.taskCountLabel.text = String(list.tasks.count)
-        }
         return cell
     }
     
@@ -102,11 +86,7 @@ extension MainListViewController: UITableViewDataSource {
             // 삭제 여부를 확실하게 묻는 alert 호출
             let alert = UIAlertController(title: "Delete list", message: "Are you sure you want to delete the list?", preferredStyle: .actionSheet)
             let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
-                // list가 important task를 포함하고 있을 때, list에 속했던 important task가 Important list에서도 삭제되어야 한다.
-                if list.tasks.contains(where: { $0.isImportant }) {
-                    self?.todoManager.lists[0].tasks.removeAll(where: { $0.listId == list.id && $0.isImportant })
-                }
-                self?.todoManager.deleteList(listId: list.id)
+                self?.todoManager.deleteList(list)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 tableView.reloadData()
                 // list count label 뷰 적용
@@ -142,4 +122,25 @@ class ListNameCell: UITableViewCell {
     @IBOutlet weak var listIcon: UIImageView!
     @IBOutlet weak var listNameLabel: UILabel!
     @IBOutlet weak var taskCountLabel: UILabel!
+    
+    func configure(with list: List) {
+        // icon : Important만 star image, 나머지 list는 checklist image
+        switch list.id {
+        case 0:
+            listIcon.image = UIImage(systemName: "star.fill")
+        default:
+            listIcon.image = UIImage(systemName: "checklist.checked")
+        }
+        
+        // text label : list 이름 표시
+        listNameLabel.text = list.name
+        
+        // count label : list 당 task 개수 표시. 0개일 때는 표시 X
+        switch list.tasks.count {
+        case 0:
+            taskCountLabel.text = ""
+        default:
+            taskCountLabel.text = String(list.tasks.count)
+        }
+    }
 }

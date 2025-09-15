@@ -148,7 +148,7 @@ extension ToDoListViewController: UICollectionViewDataSource {
         cell.checkButton.isSelected = task.isDone
         cell.checkbutton(isDone: task.isDone)
         cell.taskLabel.text = task.title
-        cell.startButton.isSelected = task.isImportant
+        cell.starButton.isSelected = task.isImportant
         
         // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
 
@@ -283,12 +283,12 @@ class ToDoCell: UICollectionViewCell {
     
     @IBOutlet weak var checkButton: UIButton!
     @IBOutlet weak var taskLabel: UILabel!
-    @IBOutlet weak var startButton: UIButton!
+    @IBOutlet weak var starButton: UIButton!
     
     var checkButtonTapHandler: ((Bool) -> Void)?
     var importantButtonTapHandler: ((Bool) -> Void)?
     
-    @IBAction func btnCheckTapped(_ sender: UIButton) {
+    @IBAction func checkButtonTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
         checkButton.isSelected = !checkButton.isSelected
         
@@ -299,12 +299,12 @@ class ToDoCell: UICollectionViewCell {
         checkButtonTapHandler?(checkButton.isSelected)
     }
     
-    @IBAction func btnImportantTapped(_ sender: UIButton) {
+    @IBAction func starButtonTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
-        startButton.isSelected = !startButton.isSelected
+        starButton.isSelected = !starButton.isSelected
         
         // 데이터 변동 : importantButtonTapHandler에 isImportant 여부 전송
-        importantButtonTapHandler?(startButton.isSelected)
+        importantButtonTapHandler?(starButton.isSelected)
     }
     
     // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리

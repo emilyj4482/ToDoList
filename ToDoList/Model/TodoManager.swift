@@ -125,10 +125,14 @@ class TodoManager {
         updateSingleTask(listId: task.listId, taskId: task.id, task: task)
     }
     
-    func deleteList(listId: Int) {
-        if let index = lists.firstIndex(where: { $0.id == listId }) {
-            lists.remove(at: index)
+    func deleteList(_ list: List) {
+        // list가 important task를 포함하고 있을 경우, 해당 task들이 Important list에서도 삭제되어야 한다.
+        if list.tasks.contains(where: { $0.isImportant }) {
+            lists[0].tasks.removeAll { $0.listId == list.id }
         }
+        
+        guard let index = lists.firstIndex(where: { $0.id == list.id }) else { return }
+        lists.remove(at: index)
     }
     
     func updateList(listId: Int, _ name: String) {
