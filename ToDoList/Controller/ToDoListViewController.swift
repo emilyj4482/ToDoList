@@ -144,11 +144,7 @@ extension ToDoListViewController: UICollectionViewDataSource {
             task = todoManager.isDoneTasks(listIndex: index)[indexPath.item]
         }
         
-        // cell 뷰 적용
-        cell.checkButton.isSelected = task.isDone
-        cell.checkbutton(isDone: task.isDone)
-        cell.taskLabel.text = task.title
-        cell.starButton.isSelected = task.isImportant
+        cell.configure(with: task)
         
         // check & important 버튼 tap에 따른 데이터 변경 Handler를 통해 적용
 
@@ -290,10 +286,10 @@ class ToDoCell: UICollectionViewCell {
     
     @IBAction func checkButtonTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
-        checkButton.isSelected = !checkButton.isSelected
+        checkButton.isSelected.toggle()
         
         // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
-        checkbutton(isDone: checkButton.isSelected)
+        strikethroughText(if: checkButton.isSelected)
         
         // 데이터 변동 : checkButtonTapHandler에 isDone 여부 전송
         checkButtonTapHandler?(checkButton.isSelected)
@@ -301,14 +297,14 @@ class ToDoCell: UICollectionViewCell {
     
     @IBAction func starButtonTapped(_ sender: UIButton) {
         // 클릭 시 이전 상태와 반대로 상태 바꿈
-        starButton.isSelected = !starButton.isSelected
+        starButton.isSelected.toggle()
         
         // 데이터 변동 : importantButtonTapHandler에 isImportant 여부 전송
         importantButtonTapHandler?(starButton.isSelected)
     }
     
     // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
-    func checkbutton(isDone: Bool) {
+    func strikethroughText(if isDone: Bool) {
         if isDone {
             taskLabel.attributedText = NSAttributedString(string: taskLabel.text!, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
             taskLabel.alpha = 0.5
@@ -316,6 +312,13 @@ class ToDoCell: UICollectionViewCell {
             taskLabel.attributedText = NSAttributedString(string: taskLabel.text!, attributes: [.strikethroughStyle: NSUnderlineStyle()])
             taskLabel.alpha = 1
         }
+    }
+    
+    func configure(with task: Task) {
+        checkButton.isSelected = task.isDone
+        strikethroughText(if: task.isDone)
+        taskLabel.text = task.title
+        starButton.isSelected = task.isImportant
     }
 }
 

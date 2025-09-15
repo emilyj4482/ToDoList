@@ -49,16 +49,16 @@ class TaskDetailViewController: UIViewController, TodoManagerInjectable {
         checkButton.isSelected = task.isDone
         starButton.isSelected = task.isImportant
         listNameLabel.text = listName
-        isTaskDone(isDone: task.isDone, string: task.title)
+        strikethroughText(if: task.isDone, text: task.title)
     }
     
     // isDone의 상태에 따라 task 글자 취소선, 흐리게 처리
-    func isTaskDone(isDone: Bool, string: String) {
+    func strikethroughText(if isDone: Bool, text: String) {
         if isDone {
-            taskTitleTextField.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+            taskTitleTextField.attributedText = NSAttributedString(string: text, attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
             taskTitleTextField.alpha = 0.5
         } else {
-            taskTitleTextField.attributedText = NSAttributedString(string: string, attributes: [.strikethroughStyle: NSUnderlineStyle()])
+            taskTitleTextField.attributedText = NSAttributedString(string: text, attributes: [.strikethroughStyle: NSUnderlineStyle()])
             taskTitleTextField.alpha = 1
         }
     }
@@ -105,8 +105,8 @@ class TaskDetailViewController: UIViewController, TodoManagerInjectable {
         var task = todoManager.lists[listIndex].tasks[taskIndex]
         
         // view update
-        checkButton.isSelected = !checkButton.isSelected
-        isTaskDone(isDone: checkButton.isSelected, string: task.title)
+        checkButton.isSelected.toggle()
+        strikethroughText(if: checkButton.isSelected, text: task.title)
         
         // 데이터 update
         task.isDone = checkButton.isSelected
@@ -118,7 +118,7 @@ class TaskDetailViewController: UIViewController, TodoManagerInjectable {
         var task = todoManager.lists[listIndex].tasks[taskIndex]
         
         // view update
-        starButton.isSelected = !starButton.isSelected
+        starButton.isSelected.toggle()
         
         // 데이터 update
         task.isImportant = starButton.isSelected
@@ -155,6 +155,6 @@ extension TaskDetailViewController {
         let task = todoManager.lists[listIndex].tasks[taskIndex]
         
         taskTitleTextField.resignFirstResponder()
-        isTaskDone(isDone: task.isDone, string: task.title)
+        strikethroughText(if: task.isDone, text: task.title)
     }
 }
