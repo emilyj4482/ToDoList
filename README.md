@@ -395,7 +395,7 @@ class TodoManager {
 ```
 
 ### 04) 디테일 화면
-| | |
+| TaskDetailView | |
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/0c978981-137d-4fa0-a453-0a9a9b6284d4"> | - `TodoListView`에서 `Task` 셀을 탭하면 디테일 화면으로 이동합니다.<br>- 할 일 완료 및 북마크/취소 처리와 타이틀 수정, 할 일 삭제를 할 수 있습니다. |
 
