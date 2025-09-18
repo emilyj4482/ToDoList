@@ -399,3 +399,92 @@ class TodoManager {
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/0c978981-137d-4fa0-a453-0a9a9b6284d4"> | - `TodoListView`에서 `Task` 셀을 탭하면 디테일 화면으로 이동합니다.<br>- 할 일 완료 및 북마크/취소 처리와 타이틀 수정, 할 일 삭제를 할 수 있습니다. |
 
+## 트러블슈팅
+### 01) 제약조건(Constraint) 우선순위 문제
+할 일 추가 시 키보드가 나타나면 `textfield` 영역을 키보드 위로 올리기 위해 `bottom` Constraint를 조정함
+```swift
+@objc private func keyboardWillShow(notification: Notification) {
+    guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+    let keyboardHeight = keyboardFrame.height
+    let adjustmentHeight = keyboardHeight - view.safeAreaInsets.bottom
+    textFieldBottonConstraint.constant = adjustmentHeight
+}
+```
+#### 📝 문제
+키보드 높이를 계산하여 제약조건을 업데이트 했는데도 텍스트필드가 키보드 위가 아닌 아래로 이동해 화면 밖으로 벗어나는 현상 발생
+#### 🎯 원인
+오토레이아웃의 `First Item`과 `Second Item`이 잘못 설정 되어 있었음 - `TextFieldContainer.bottom = SafeArea.bottom + constant` 형태가 되어야 했으나 반대로 설정되어 `constant`가 양수일수록 아래 방향으로 이동하게 되었던 것
+<br><br><img src="https://github.com/user-attachments/assets/d549b53c-b43a-4c0d-a75b-3a52c0be8468" width="300">
+#### ⚡ 해결
+`SafeArea.bottom`이 `First Item`이 되도록 지정
+#### 💭 성과
+- Constraint의 `First Item`과 `Second Item` 위치에 따라 `constant`의 방향(+, -)이 달라짐을 학습
+- 오토레이아웃 문제의 원인을 찾을 때 뷰 계층과 제약조건 방향을 시각적으로 확인하는 것의 중요성을 깨달음
+
+### 02) UITapGestureRecognizer 사용 시 터치이벤트 경합 문제
+키보드가 올라와있는 상태에서 화면을 탭했을 때 키보드가 내려가도록 구현하기 위해 UITapGestureRecognizer 활용
+```swift
+override func viewDidLoad() {
+	// ... //
+
+	view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(hideKeyboard)))
+}
+```
+#### 📝 문제 1
+collectionView의 didSelectItemAt이 인식되지 않음
+#### 🎯 원인
+UITapGestureRecognizer.cancelsTouchesInView (탭 제스처 이외의 터치 이벤트 무시)의 기본값이 true - 셀에 대한 터치 이벤트가 뷰로 전달되지 않음
+#### ⚡ 해결
+UITapGestureRecognizer.cancelsTouchesInView를 false로 지정
+```swift
+let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+tapGestureRecognizer.cancelsTouchesInView = false
+view.addGestureRecognizer(tapGestureRecognizer)
+```
+> 하지만 이렇게 처리한 뒤 새로운 문제 발생
+#### 📝 문제 2
+`UIButton`에 대한 탭 인식이 되지 않음 - 탭 제스처 이외의 터치 이벤트도 인식하도록 `cancelsTouchesInView = false`처리를 했기 때문에 예상을 벗어나는 상황
+#### 🎯 원인
+- cell 탭 이벤트는 UIKit 내부적으로 제스처 기반으로 처리되므로 UITapGestureRecognizer와 자연스럽게 공존
+- 반면 button 탭은 UIControlEvent 기반으로 작동하여 제스처와 충돌
+- 심지어, 키보드가 올라와 있다는 특수상황 때문에 키보드 dismiss 동작과 우선순위에서 밀리게 됨 > 버튼의 `touchUpInside`가 호출되지 않음(이벤트 무효화)
+
+| 단계 | 셀 탭 (정상 동작) | 버튼 탭 (문제 발생) |
+| --- | --- | --- |
+| 1. 터치 시작 | 셀 터치 시작 | 버튼 터치 시작 |
+| 2. iOS 내부 처리 | UITapGestureRecognizer와 셀 제스처 **동시에 작동** | **키보드 dismiss 제스처가 먼저 작동** |
+| 3. cancelsTouchesInView = false | 두 이벤트 모두 처리됨 | 버튼 이벤트가 **소모되어 무효화** |
+| 최종 결과 | `didSelectItemAt` 정상 호출 ✅ | `touchUpInside` 호출되지 않음 ❌ |
+
+#### ⚡ 해결
+cancelsTouchesInView 값을 키보드 상황에 따라 toggle
+```swift
+class ToDoListViewController: UIViewController {
+	// ... //
+
+	// 탭 제스쳐를 전역변수로 선언
+	var tapGestureRecognizer = UITapGestureRecognizer()
+
+	override func viewDidLoad() {
+		tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+		tapGestureRecognizer.cancelsTouchesInView = false view.addGestureRecognizer(tapGestureRecognizer)
+	}
+
+	// 입력모드 on/off 때마다 cancelsTouchesInView값 toggle
+	@objc private func keyboardWillShow() {
+		// ... //
+
+		tapGestureRecognizer.cancelsTouchesInView = true
+	}
+
+	@objc private func keyboardWillHide() {
+		// ... //
+
+	tapGestureRecognizer.cancelsTouchesInView = false
+	}
+}
+```
+#### 💭 성과
+- 셀과 버튼의 터치 이벤트 처리 방식이 다르다는 것 이해
+- 특히 키보드가 올라와 있을 때는 키보드 dismiss 제스처가 우선 작동하여 버튼 이벤트가 무효화될 수 있다는 것을 학습
+- 이벤트 충돌을 방지하는 제스처 관리 전략 습득
