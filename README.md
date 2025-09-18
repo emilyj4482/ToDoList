@@ -35,7 +35,7 @@
 └── Info.plist
 ```
 
-## 스토리보드 기반 프로젝트에서 객체 의존성 주입
+## 📌 스토리보드 기반 프로젝트에서 객체 의존성 주입
 ```swift
 class MainViewController: UIViewController {
 	private var todoManager: TodoManager
@@ -107,8 +107,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 ```
 
-## 화면 별 구현
-### 01) 메인 화면
+## 📌 화면 별 구현
+### 1️⃣ 메인 화면
 | MainListView | |
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/6c996b8e-669f-462c-bfe9-70673f11b220" width="320"> | - 할 일(`Task`)의 그룹인 `List`들의 목록을 `UITableView`로 구현한 메인 화면입니다.<br>- 북마크 된 Task들이 추가되는 `Important` list는 앱 최초 실행 시 기본값으로 존재합니다.<br>- 리스트 이름 오른쪽에는 리스트에 추가 된 할 일(`Task`) 개수를 나타내는 label이 있습니다.<br>- 하단 label에서 `Important` list를 제외한 커스텀 list의 개수를 안내하고 있습니다.<br>- 하단 `+ New List` 버튼을 눌러 새로운 `List`를 추가할 수 있습니다. |
@@ -159,7 +159,7 @@ func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.Ed
 ```
 
 
-### 02) 리스트 추가 화면
+### 2️⃣ 리스트 추가 화면
 | AddNewListView | |
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/729c6416-f29f-4834-955a-260815608e99" width="320"> | - 새로운 리스트를 추가하는 화면입니다.<br>- 사용자의 입력값이 공백인 경우 placeholder에 적혀있는 `Untitled list`로 추가됩니다. |
@@ -239,7 +239,7 @@ class ToDoListViewController: UIViewController
 }
 ```
 
-### 03) 투두리스트 화면
+### 3️⃣ 투두리스트 화면
 | TodoListView | |
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/d22c3a6f-ad8e-42e8-b4a0-689cecb2d571" width="320"> | 메인화면에서 리스트 셀을 탭하면 나타나는 화면입니다. |
@@ -394,13 +394,13 @@ class TodoManager {
 }
 ```
 
-### 04) 디테일 화면
+### 4️⃣ 디테일 화면
 | TaskDetailView | |
 | ----- | ----- |
 | <img src="https://github.com/user-attachments/assets/0c978981-137d-4fa0-a453-0a9a9b6284d4"> | - `TodoListView`에서 `Task` 셀을 탭하면 디테일 화면으로 이동합니다.<br>- 할 일 완료 및 북마크/취소 처리와 타이틀 수정, 할 일 삭제를 할 수 있습니다. |
 
-## 트러블슈팅
-### 01) 제약조건(Constraint) 우선순위 문제
+## 📌 트러블슈팅
+### 1️⃣ 제약조건(Constraint) 우선순위 문제
 할 일 추가 시 키보드가 나타나면 `textfield` 영역을 키보드 위로 올리기 위해 `bottom` Constraint를 조정함
 ```swift
 @objc private func keyboardWillShow(notification: Notification) {
@@ -421,7 +421,7 @@ class TodoManager {
 - Constraint의 `First Item`과 `Second Item` 위치에 따라 `constant`의 방향(+, -)이 달라짐을 학습
 - 오토레이아웃 문제의 원인을 찾을 때 뷰 계층과 제약조건 방향을 시각적으로 확인하는 것의 중요성을 깨달음
 
-### 02) UITapGestureRecognizer 사용 시 터치이벤트 경합 문제
+### 2️⃣ UITapGestureRecognizer 사용 시 터치이벤트 경합 문제
 키보드가 올라와있는 상태에서 화면을 탭했을 때 키보드가 내려가도록 구현하기 위해 UITapGestureRecognizer 활용
 ```swift
 override func viewDidLoad() {
