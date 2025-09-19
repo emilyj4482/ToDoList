@@ -28,7 +28,7 @@
 │   └── Main.storyboard
 ├── 📂 Controller
 │   ├── MainListViewController.swift
-│   ├── AddNewListViewController.swift.swift
+│   ├── AddNewListViewController.swift
 │   ├── ToDoListViewController.swift
 │   └── TaskDetailViewController.swift
 ├── Assets.xcassets
